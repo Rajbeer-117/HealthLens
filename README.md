@@ -1,3 +1,4 @@
+#HealthLens
 # PranaChain Health Intelligence
 
 COMP 8967 – Fall 2026  
