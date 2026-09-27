@@ -1,6 +1,5 @@
-#HealthLens
 # PranaChain Health Intelligence
-
+## HealthLens
 COMP 8967 – Fall 2026  
 University of Windsor
 
