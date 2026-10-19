@@ -2,3 +2,16 @@ document.querySelectorAll('.tab').forEach(button=>button.addEventListener('click
 const raw=document.getElementById('dashboardData');
 if(raw){const data=JSON.parse(raw.textContent);const metric=document.getElementById('metricSelect');let chart=null;Object.keys(data.charts).forEach(k=>{const option=document.createElement('option');option.value=k;option.textContent=k;metric.append(option)});function draw(){const points=data.charts[metric.value]||[];const canvas=document.getElementById('healthChart');if(chart)chart.destroy();if(typeof Chart==='undefined'){canvas.insertAdjacentHTML('beforebegin','<p>Chart.js could not load. Check internet access.</p>');return;}chart=new Chart(canvas,{type:'line',data:{labels:points.map(x=>x.date),datasets:[{label:metric.value,data:points.map(x=>x.value),borderColor:'#9445c7',backgroundColor:'rgba(148,69,199,.12)',tension:.25,pointRadius:2,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true}},scales:{x:{ticks:{maxTicksLimit:10}}}}});}if(metric.options.length){metric.addEventListener('change',draw);draw();}
 const select=document.getElementById('sheetSelect');Object.keys(data.sheets).forEach(k=>{const opt=document.createElement('option');opt.value=k;opt.textContent=k;select.append(opt)});function showSheet(){const sheet=data.sheets[select.value];if(!sheet)return;const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));document.getElementById('sheetTable').innerHTML='<table><thead><tr>'+sheet.columns.map(x=>'<th>'+escape(x)+'</th>').join('')+'</tr></thead><tbody>'+sheet.rows.map(row=>'<tr>'+row.map(x=>'<td>'+escape(x)+'</td>').join('')+'</tr>').join('')+'</tbody></table>';}select.addEventListener('change',showSheet);showSheet();}
+
+// Small multiples: every available measurement series is drawn separately.
+if(raw && typeof Chart!=='undefined'){
+ const dataset=JSON.parse(raw.textContent).charts;
+ const holder=document.getElementById('miniCharts');
+ Object.entries(dataset).filter(([,points])=>points.length).forEach(([name,points],index)=>{
+  const panel=document.createElement('article');panel.className='mini-chart';
+  const title=document.createElement('h4');title.textContent=name;panel.append(title);
+  const wrap=document.createElement('div');wrap.className='mini-canvas';
+  const canvas=document.createElement('canvas');wrap.append(canvas);panel.append(wrap);holder.append(panel);
+  new Chart(canvas,{type:'line',data:{labels:points.map(x=>x.date),datasets:[{data:points.map(x=>x.value),borderColor:index%2?'#138a83':'#9445c7',backgroundColor:'transparent',tension:.25,pointRadius:points.length>35?0:2,borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{maxTicksLimit:4}},y:{beginAtZero:false}}}});
+ });
+}

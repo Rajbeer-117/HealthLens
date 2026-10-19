@@ -8,9 +8,12 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 ROOT = Path(__file__).resolve().parent
 app = Flask(__name__)
 app.secret_key = os.environ.get('HEALTHLENS_SECRET_KEY') or secrets.token_hex(32)  # local demo; resets on restart
-app.config.update(SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE='Lax')
+app.config.update(SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE='Lax', MAX_CONTENT_LENGTH=65*1024*1024)
 DB = ROOT / 'users.sqlite3'
 DATA = ROOT / 'patient_data.zip'
+UPLOADS = ROOT / 'local_uploads'  # Local demonstration only; do not upload identifiable health data.
+MAX_BOOK = 6*1024*1024
+MAX_FILES = 120
 
 def db():
     conn=sqlite3.connect(DB)
@@ -77,6 +80,14 @@ def login():
         flash('Incorrect email/username or password.','error')
     return render_template('login.html')
 
+@app.context_processor
+def current_account():
+    if not session.get('uid'):
+        return {'account': None}
+    with db() as conn:
+        user=conn.execute('SELECT username, email FROM users WHERE id=?',(session['uid'],)).fetchone()
+    return {'account': dict(user) if user else None}
+
 @app.route('/logout',methods=['POST'])
 @login_required
 def logout():
@@ -87,6 +98,66 @@ def patient_members():
     if not DATA.exists(): return {}
     with zipfile.ZipFile(DATA) as z:
         return {Path(n).stem:n for n in z.namelist() if n.lower().endswith('.xlsx') and not n.startswith('__MACOSX')}
+
+def user_upload_dir():
+    return UPLOADS / str(int(session['uid']))
+
+def uploaded_members():
+    folder=user_upload_dir()
+    return {f.stem:f for f in folder.glob('*.xlsx') if f.is_file()} if folder.exists() else {}
+
+def validate_workbook(raw):
+    if len(raw)>MAX_BOOK: raise ValueError('Each workbook must be 6 MB or smaller.')
+    try:
+        book=pd.read_excel(io.BytesIO(raw),sheet_name=None,engine='openpyxl')
+    except Exception as exc:
+        raise ValueError('The selected file is not a readable XLSX workbook.') from exc
+    if 'Patient Profile' not in book: raise ValueError('Workbook must include a Patient Profile sheet.')
+    if not any(k in book for k in ('Lab Results','Vitals Daily','Wearable Daily')):
+        raise ValueError('Workbook must include Lab Results, Vitals Daily, or Wearable Daily.')
+    return book
+
+@app.route('/upload-patients', methods=['POST'])
+@login_required
+def upload_patients():
+    if request.form.get('csrf')!=session.get('upload_csrf'):
+        flash('Upload verification failed. Refresh and try again.','error')
+        return redirect(url_for('dashboard'))
+    incoming=request.files.get('patient_file')
+    if not incoming or not incoming.filename:
+        flash('Choose an XLSX workbook or ZIP archive.','error')
+        return redirect(url_for('dashboard'))
+    filename=Path(incoming.filename).name
+    ext=Path(filename).suffix.lower()
+    if ext not in ('.xlsx','.zip'):
+        flash('Only .xlsx or .zip files are supported.','error')
+        return redirect(url_for('dashboard'))
+    raw=incoming.read()
+    try:
+        candidates=[]
+        if ext=='.xlsx':
+            candidates=[(filename,raw)]
+        else:
+            with zipfile.ZipFile(io.BytesIO(raw)) as archive:
+                entries=[entry for entry in archive.infolist() if not entry.is_dir() and entry.filename.lower().endswith('.xlsx') and not Path(entry.filename).name.startswith('~$')]
+                if not entries or len(entries)>MAX_FILES: raise ValueError('ZIP must contain 1–120 XLSX patient workbooks.')
+                if any(e.file_size>MAX_BOOK for e in entries): raise ValueError('A workbook exceeds the 6 MB limit.')
+                candidates=[(Path(e.filename).name,archive.read(e)) for e in entries]
+        prepared=[]
+        for name,data in candidates:
+            stem=Path(name).stem
+            if not re.fullmatch(r'[A-Za-z0-9_-]{1,60}',stem): raise ValueError('Patient filenames must contain only letters, numbers, underscores or hyphens.')
+            validate_workbook(data)
+            prepared.append((stem,data))
+        if len({stem for stem,_ in prepared})!=len(prepared): raise ValueError('Duplicate patient filenames in ZIP.')
+        folder=user_upload_dir()
+        folder.mkdir(parents=True,exist_ok=True)
+        for stem,data in prepared: (folder/(stem+'.xlsx')).write_bytes(data)
+        flash(f'Imported {len(prepared)} patient workbook(s). Choose a patient to view their charts and warnings.','success')
+        return redirect(url_for('dashboard',source='uploaded',patient=prepared[0][0]))
+    except (ValueError,zipfile.BadZipFile,RuntimeError) as exc:
+        flash(str(exc),'error')
+        return redirect(url_for('dashboard'))
 
 def load_book(member):
     with zipfile.ZipFile(DATA) as z: raw=z.read(member)
@@ -136,23 +207,90 @@ def safe_rows(frame,limit=150):
     clean=clean.where(pd.notna(clean),None)
     return {'columns':[str(x) for x in clean.columns],'rows':[[str(v) if v is not None else '' for v in row] for row in clean.itertuples(index=False,name=None)]}
 
+# Educational reference thresholds, not personalized clinical decision rules.
+# These values are illustrative adult screening cutoffs and require clinical context.
+REFERENCE_RULES = {
+    'Labs · Fasting glucose': (70, 99, 'mg/dL'),
+    'Labs · HbA1c': (0, 5.6, '%'),
+    'Labs · LDL': (0, 99, 'mg/dL'),
+    'Labs · HDL': (40, None, 'mg/dL'),
+    'Vitals · Systolic BP': (90, 119, 'mmHg'),
+    'Vitals · Diastolic BP': (60, 79, 'mmHg'),
+    'Vitals · Resting HR': (60, 100, 'bpm'),
+}
+
+def health_flags(charts):
+    flags=[]
+    for name, (low, high, unit) in REFERENCE_RULES.items():
+        points=charts.get(name, [])
+        if not points: continue
+        latest=points[-1]
+        value=latest['value']
+        if (low is not None and value < low) or (high is not None and value > high):
+            range_text=(f'{low}–{high}' if low is not None and high is not None else
+                        f'≥{low}' if low is not None else f'≤{high}')
+            flags.append({'metric':name.split(' · ')[-1], 'value':f'{value:g}',
+                          'unit':unit, 'date':latest['date'], 'reference':range_text,
+                          'severity':'Review',
+                          'message':'Latest recorded value is outside the illustrative adult reference range. Discuss with a qualified clinician; interpretation depends on your health context.'})
+    return flags
+
+def longitudinal_insights(charts):
+    """Descriptive, non-diagnostic changes; no risk prediction or medical inference."""
+    findings=[]
+    for metric,points in charts.items():
+        if len(points)<4: continue
+        recent=points[-4:]
+        baseline=points[:-4]
+        if len(baseline)<3: continue
+        old=sum(x['value'] for x in baseline)/len(baseline)
+        new=sum(x['value'] for x in recent)/len(recent)
+        if abs(old)<1e-9: continue
+        pct=(new-old)/abs(old)*100
+        # Only report changes, not whether they are medically harmful.
+        if abs(pct)<15: continue
+        findings.append({'metric':metric,'change':round(pct,1),
+          'baseline':round(old,2),'recent':round(new,2),
+          'date':recent[-1]['date'],'count':len(points),
+          'evidence':f'Average of {len(baseline)} earlier measurements compared with the most recent 4.',
+          'interpretation':'Change detected; significance is unknown without clinical context, measurement conditions and individual baseline.'})
+    return sorted(findings,key=lambda x:abs(x['change']),reverse=True)[:12]
+
+def history_events(book):
+    events=[]
+    for sheet_name,frame in book.items():
+        if not any(term in sheet_name.lower() for term in ('diagnos','condition','medical history','problem')): continue
+        clean=prepare(frame)
+        for _,row in clean.head(100).iterrows():
+            fields={str(k):str(v) for k,v in row.items() if pd.notna(v)}
+            if not fields: continue
+            date=fields.get('Date',fields.get('Diagnosis Date','Not dated'))
+            detail=' · '.join(f'{k}: {v}' for k,v in fields.items() if k not in ('Date','Diagnosis Date'))
+            events.append({'date':str(date)[:10],'source':sheet_name,'detail':detail[:450]})
+    return sorted(events,key=lambda x:x['date'],reverse=True)[:100]
+
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    members=patient_members()
-    if not members: return render_template('dashboard.html',username=session['username'],error='patient_data.zip not found or contains no .xlsx workbooks',patients=[],selected='',profile={},charts={},observations=[],meds={'columns':[],'rows':[]},sheets={})
+    source=request.args.get('source','demo')
+    if source not in ('demo','uploaded'): source='demo'
+    members=uploaded_members() if source=='uploaded' else patient_members()
+    if not members: return render_template('dashboard.html',username=session['username'],error=('No uploaded patient workbooks yet. Upload an XLSX file or ZIP archive below.' if source=='uploaded' else 'patient_data.zip not found or contains no .xlsx workbooks'),patients=[],selected='',source=source,upload_csrf=session.setdefault('upload_csrf',secrets.token_urlsafe(24)),profile={},charts={},flags=[],insights=[],history=[],observations=[],meds={'columns':[],'rows':[]},sheets={})
     ids=sorted(members)
     selected=request.args.get('patient','PC0101')
     if selected not in members: selected=ids[0]
-    book=load_book(members[selected])
+    book=(pd.read_excel(members[selected],sheet_name=None,engine='openpyxl') if source=='uploaded' else load_book(members[selected]))
     profile=book.get('Patient Profile',pd.DataFrame())
     info=dict(zip(profile.get('Field',[]),profile.get('Value',[])))
     charts=chart_series(book)
+    flags=health_flags(charts)
+    insights=longitudinal_insights(charts)
+    history=history_events(book)
     units={'Labs · Fasting glucose':'mg/dL','Vitals · Systolic BP':'mmHg','Vitals · Weight kg':'kg','Wearables · Steps':'steps','Wearables · Sleep Hours':'hours'}
     chosen=['Labs · Fasting glucose','Vitals · Systolic BP','Vitals · Weight kg','Wearables · Steps','Wearables · Sleep Hours']
     observations=[observation(key.split(' · ')[-1],charts.get(key,[]),units.get(key,'')) for key in chosen]
     observations=[x for x in observations if x]
-    return render_template('dashboard.html',username=session['username'],error=None,patients=ids,selected=selected,profile=info,charts=charts,observations=observations,meds=safe_rows(book.get('Medication History',pd.DataFrame())),sheets={k:safe_rows(v) for k,v in book.items()})
+    return render_template('dashboard.html',username=session['username'],error=None,patients=ids,selected=selected,source=source,upload_csrf=session.setdefault('upload_csrf',secrets.token_urlsafe(24)),profile=info,charts=charts,flags=flags,insights=insights,history=history,observations=observations,meds=safe_rows(book.get('Medication History',pd.DataFrame())),sheets={k:safe_rows(v) for k,v in book.items()})
 
 if __name__=='__main__':
     app.run(debug=True,host='127.0.0.1',port=5000)
