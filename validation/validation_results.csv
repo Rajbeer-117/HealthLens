@@ -1,0 +1,901 @@
+patient,sex,history,evidence,sustained_trends,anomaly_episodes,lab_flags,relationships,co_occurrences,timeline_events,guardrail_flags_in_evidence,metabolic_status,metabolic_signals,cardiovascular_status,cardiovascular_signals,pcos_status,pcos_signals
+PC0001,Female,borderline glycemic markers,40,11,8,5,2,0,48,0,pattern,3,partial,2,none,1
+PC0002,Male,borderline glycemic markers,42,12,8,6,2,1,32,0,pattern,3,partial,2,not_applicable,0
+PC0003,Female,borderline glycemic markers,39,12,7,3,2,0,51,0,pattern,3,pattern,3,none,2
+PC0004,Male,borderline glycemic markers,36,8,10,5,2,2,37,0,pattern,3,partial,2,not_applicable,0
+PC0005,Female,borderline glycemic markers,32,6,8,6,0,0,47,0,pattern,4,partial,2,none,4
+PC0006,Female,borderline glycemic markers,33,9,6,5,2,0,46,0,partial,2,pattern,3,none,2
+PC0007,Female,borderline glycemic markers,40,10,8,6,2,0,45,0,partial,2,partial,2,none,1
+PC0008,Female,borderline glycemic markers,44,10,10,7,1,1,50,0,none,1,pattern,3,none,1
+PC0009,Male,borderline glycemic markers,34,6,8,3,2,0,36,0,pattern,3,partial,2,not_applicable,0
+PC0010,Male,borderline glycemic markers,41,13,10,3,4,0,37,0,pattern,3,partial,2,not_applicable,0
+PC0011,Male,borderline glycemic markers,32,9,8,3,0,0,36,0,partial,2,pattern,3,not_applicable,0
+PC0012,Female,borderline glycemic markers,41,11,7,6,4,0,45,0,pattern,3,partial,2,none,1
+PC0013,Female,borderline glycemic markers,40,12,9,5,3,0,43,0,pattern,4,pattern,3,none,3
+PC0014,Female,borderline glycemic markers,31,10,4,4,2,0,46,0,pattern,4,pattern,3,none,2
+PC0015,Male,borderline glycemic markers,19,2,2,6,0,0,23,0,partial,2,pattern,3,not_applicable,0
+PC0016,Male,borderline glycemic markers,28,7,3,3,1,0,30,0,pattern,3,none,1,not_applicable,0
+PC0017,Female,borderline glycemic markers,33,8,8,4,3,0,43,0,none,1,partial,2,none,1
+PC0018,Male,borderline glycemic markers,37,9,8,6,1,0,32,0,pattern,4,partial,2,not_applicable,0
+PC0019,Male,borderline glycemic markers,41,15,8,4,2,0,36,0,pattern,4,partial,2,not_applicable,0
+PC0020,Female,borderline glycemic markers,39,12,5,5,1,0,41,0,pattern,3,partial,2,none,2
+PC0021,Male,borderline glycemic markers,35,8,11,5,0,0,37,0,pattern,4,pattern,3,not_applicable,0
+PC0022,Male,borderline glycemic markers,32,8,6,3,1,1,36,0,pattern,3,partial,2,not_applicable,0
+PC0023,Male,borderline glycemic markers,22,2,2,5,0,0,30,0,pattern,4,partial,2,not_applicable,0
+PC0024,Female,borderline glycemic markers,34,10,9,3,2,0,53,0,pattern,3,partial,2,none,3
+PC0025,Female,borderline glycemic markers,44,16,9,3,1,0,51,0,none,1,partial,2,none,1
+PC0026,Female,borderline glycemic markers,31,7,7,3,2,0,46,0,pattern,3,partial,2,none,2
+PC0027,Female,borderline glycemic markers,33,3,7,6,0,0,48,0,pattern,5,partial,2,none,4
+PC0028,Male,borderline glycemic markers,41,12,6,5,2,0,34,0,pattern,3,pattern,3,not_applicable,0
+PC0029,Female,borderline glycemic markers,45,15,7,5,1,0,46,0,partial,2,pattern,3,none,1
+PC0030,Female,borderline glycemic markers,41,11,9,6,2,2,47,0,pattern,4,none,1,none,3
+PC0031,Male,borderline glycemic markers,32,11,2,3,2,0,31,0,pattern,3,pattern,3,not_applicable,0
+PC0032,Female,borderline glycemic markers,31,7,6,5,2,0,46,0,partial,2,pattern,3,none,1
+PC0033,Male,borderline glycemic markers,20,4,6,4,0,0,23,0,pattern,4,partial,2,not_applicable,0
+PC0034,Female,borderline glycemic markers,40,10,8,4,2,0,52,0,none,1,pattern,3,none,1
+PC0035,Male,borderline glycemic markers,32,7,9,5,0,0,31,0,pattern,4,pattern,3,not_applicable,0
+PC0036,Female,borderline glycemic markers,26,6,7,2,1,1,45,0,partial,2,none,1,none,1
+PC0037,Male,borderline glycemic markers,32,7,7,5,0,0,34,0,pattern,5,partial,2,not_applicable,0
+PC0038,Male,borderline glycemic markers,47,12,8,6,3,0,39,0,pattern,4,pattern,3,not_applicable,0
+PC0039,Male,borderline glycemic markers,43,14,7,5,2,0,33,0,partial,2,partial,2,not_applicable,0
+PC0040,Male,borderline glycemic markers,37,2,14,4,0,1,46,0,pattern,3,partial,2,not_applicable,0
+PC0041,Female,borderline glycemic markers,28,4,3,3,0,0,47,0,pattern,4,pattern,3,none,2
+PC0042,Male,borderline glycemic markers,37,7,10,2,2,1,40,0,pattern,3,none,1,not_applicable,0
+PC0043,Male,borderline glycemic markers,34,5,8,6,0,0,38,0,pattern,3,pattern,3,not_applicable,0
+PC0044,Female,borderline glycemic markers,46,11,10,6,2,2,51,0,pattern,4,pattern,3,none,2
+PC0045,Male,borderline glycemic markers,37,12,8,5,2,0,32,0,pattern,3,pattern,3,not_applicable,0
+PC0046,Female,borderline glycemic markers,37,10,6,7,3,0,46,0,partial,2,partial,2,none,1
+PC0047,Female,borderline glycemic markers,49,13,11,6,2,1,53,0,pattern,3,pattern,3,none,2
+PC0048,Female,borderline glycemic markers,45,13,10,6,2,0,47,0,partial,2,partial,2,none,1
+PC0049,Male,borderline glycemic markers,38,14,7,5,1,0,36,0,pattern,4,pattern,3,not_applicable,0
+PC0050,Female,borderline glycemic markers,29,10,4,4,1,0,40,0,pattern,3,none,1,none,2
+PC0051,Female,borderline glycemic markers,39,9,8,5,2,0,47,0,partial,2,pattern,3,none,1
+PC0052,Female,borderline glycemic markers,41,12,6,4,3,1,43,0,pattern,4,partial,2,none,2
+PC0053,Male,borderline glycemic markers,33,13,5,3,2,0,32,0,pattern,4,partial,2,not_applicable,0
+PC0054,Female,borderline glycemic markers,26,3,7,5,0,0,46,0,pattern,3,pattern,3,none,1
+PC0055,Female,borderline glycemic markers,41,10,11,7,1,0,50,0,pattern,4,pattern,3,none,3
+PC0056,Male,borderline glycemic markers,47,14,9,4,2,1,37,0,pattern,3,partial,2,not_applicable,0
+PC0057,Female,borderline glycemic markers,36,10,7,4,1,0,50,0,pattern,3,pattern,3,none,1
+PC0058,Female,borderline glycemic markers,38,12,8,5,1,0,47,0,partial,2,pattern,3,none,1
+PC0059,Female,borderline glycemic markers,36,11,5,5,2,0,45,0,pattern,3,pattern,3,none,2
+PC0060,Female,borderline glycemic markers,24,4,3,5,0,0,43,0,partial,2,partial,2,none,1
+PC0061,Male,borderline glycemic markers,38,10,7,3,2,0,38,0,pattern,4,partial,2,not_applicable,0
+PC0062,Female,borderline glycemic markers,33,12,8,5,0,1,43,0,pattern,3,partial,2,none,2
+PC0063,Female,borderline glycemic markers,41,10,10,4,3,0,47,0,partial,2,pattern,3,none,2
+PC0064,Female,borderline glycemic markers,27,4,4,5,0,0,46,0,partial,2,pattern,3,none,1
+PC0065,Male,borderline glycemic markers,32,8,7,4,3,0,29,0,pattern,3,partial,2,not_applicable,0
+PC0066,Female,borderline glycemic markers,39,13,6,4,2,0,47,0,partial,2,partial,2,none,1
+PC0067,Female,borderline glycemic markers,40,12,9,4,2,0,49,0,partial,2,partial,2,none,1
+PC0068,Male,borderline glycemic markers,37,13,5,4,3,0,32,0,partial,2,pattern,3,not_applicable,0
+PC0069,Male,borderline glycemic markers,26,3,7,5,0,0,34,0,partial,2,pattern,3,not_applicable,0
+PC0070,Male,borderline glycemic markers,34,4,8,6,0,0,35,0,partial,2,pattern,3,not_applicable,0
+PC0071,Female,borderline glycemic markers,25,7,3,3,2,0,41,0,partial,2,partial,2,none,1
+PC0072,Female,borderline glycemic markers,42,12,11,5,1,0,52,0,pattern,3,partial,2,none,1
+PC0073,Female,borderline glycemic markers,37,10,8,5,2,0,48,0,pattern,3,partial,2,none,1
+PC0074,Male,borderline glycemic markers,34,11,5,4,1,0,31,0,pattern,3,pattern,3,not_applicable,0
+PC0075,Female,borderline glycemic markers,36,9,8,4,2,1,47,0,partial,2,partial,2,none,2
+PC0076,Male,borderline glycemic markers,41,11,10,5,2,1,42,0,pattern,3,pattern,3,not_applicable,0
+PC0077,Male,borderline glycemic markers,31,8,4,3,2,0,28,0,partial,2,partial,2,not_applicable,0
+PC0078,Female,borderline glycemic markers,40,10,10,5,1,0,48,0,partial,2,partial,2,none,1
+PC0079,Female,borderline glycemic markers,40,10,9,3,2,0,48,0,partial,2,pattern,3,none,1
+PC0080,Male,borderline glycemic markers,38,10,7,4,2,0,36,0,pattern,3,none,1,not_applicable,0
+PC0081,Male,borderline glycemic markers,40,13,9,5,1,0,36,0,pattern,4,pattern,3,not_applicable,0
+PC0082,Female,borderline glycemic markers,37,10,10,5,0,1,48,0,pattern,3,partial,2,none,2
+PC0083,Female,borderline glycemic markers,24,3,6,4,0,0,44,0,pattern,5,partial,2,none,2
+PC0084,Female,borderline glycemic markers,35,8,6,5,2,0,46,0,pattern,3,none,1,none,2
+PC0085,Female,borderline glycemic markers,43,12,8,6,0,1,49,0,pattern,6,pattern,4,none,3
+PC0086,Female,borderline glycemic markers,34,7,8,5,2,0,48,0,pattern,4,partial,2,none,3
+PC0087,Female,borderline glycemic markers,38,9,8,4,2,0,49,0,pattern,3,partial,2,none,2
+PC0088,Male,borderline glycemic markers,36,7,8,5,2,0,37,0,pattern,3,partial,2,not_applicable,0
+PC0089,Male,borderline glycemic markers,39,10,13,4,2,1,32,0,partial,2,partial,2,not_applicable,0
+PC0090,Male,borderline glycemic markers,36,10,9,4,2,0,38,0,partial,2,pattern,3,not_applicable,0
+PC0091,Male,borderline glycemic markers,34,7,7,6,2,0,32,0,pattern,4,partial,2,not_applicable,0
+PC0092,Female,borderline glycemic markers,32,10,4,6,2,0,40,0,partial,2,partial,2,none,2
+PC0093,Male,borderline glycemic markers,37,12,8,4,1,0,37,0,partial,2,pattern,3,not_applicable,0
+PC0094,Female,borderline glycemic markers,34,11,4,6,2,0,43,0,pattern,3,partial,2,none,2
+PC0095,Male,borderline glycemic markers,26,6,4,3,1,0,37,0,pattern,3,partial,2,not_applicable,0
+PC0096,Female,borderline glycemic markers,31,3,5,7,0,0,49,0,pattern,3,pattern,3,none,3
+PC0097,Male,borderline glycemic markers,28,5,7,5,0,0,30,0,pattern,4,partial,2,not_applicable,0
+PC0098,Male,borderline glycemic markers,28,5,7,4,0,0,37,0,pattern,4,pattern,3,not_applicable,0
+PC0099,Female,borderline glycemic markers,39,11,7,4,2,1,45,0,none,1,pattern,3,none,1
+PC0100,Female,borderline glycemic markers,32,8,6,5,3,0,44,0,pattern,3,pattern,3,none,2
+PC0101,Male,borderline glycemic markers,36,12,1,6,2,0,28,0,partial,2,pattern,3,not_applicable,0
+PC0102,Female,borderline glycemic markers,38,11,6,5,2,0,50,0,pattern,3,pattern,3,none,2
+PC0103,Male,borderline glycemic markers,22,4,3,6,0,0,28,0,pattern,4,partial,2,not_applicable,0
+PC0104,Female,borderline glycemic markers,41,12,10,4,3,1,49,0,pattern,3,partial,2,none,2
+PC0105,Female,borderline glycemic markers,39,10,9,6,2,1,47,0,pattern,3,partial,2,none,1
+PC0106,Male,borderline glycemic markers,24,4,8,4,0,1,29,0,pattern,4,partial,2,not_applicable,0
+PC0107,Female,borderline glycemic markers,24,1,7,7,0,1,45,0,pattern,4,partial,2,none,2
+PC0108,Male,borderline glycemic markers,24,4,7,3,0,0,34,0,partial,2,pattern,3,not_applicable,0
+PC0109,Male,borderline glycemic markers,45,13,11,5,1,0,39,0,partial,2,partial,2,not_applicable,0
+PC0110,Male,borderline glycemic markers,35,10,4,4,2,0,33,0,pattern,3,pattern,3,not_applicable,0
+PC0111,Male,borderline glycemic markers,39,14,6,5,2,1,28,0,pattern,4,pattern,3,not_applicable,0
+PC0112,Female,borderline glycemic markers,28,5,6,5,1,0,46,0,pattern,3,pattern,3,none,2
+PC0113,Female,borderline glycemic markers,38,11,7,3,2,0,49,0,partial,2,none,1,none,2
+PC0114,Male,borderline glycemic markers,32,10,5,2,2,0,29,0,none,1,partial,2,not_applicable,0
+PC0115,Female,borderline glycemic markers,29,7,7,4,0,0,43,0,pattern,4,pattern,3,none,3
+PC0116,Female,borderline glycemic markers,26,4,6,5,0,0,41,0,pattern,4,pattern,3,none,1
+PC0117,Male,borderline glycemic markers,41,12,10,4,1,2,37,0,pattern,3,partial,2,not_applicable,0
+PC0118,Male,borderline glycemic markers,27,5,2,5,0,0,26,0,pattern,5,partial,2,not_applicable,0
+PC0119,Female,borderline glycemic markers,41,15,7,6,2,1,40,0,pattern,4,partial,2,none,3
+PC0120,Female,borderline glycemic markers,36,10,2,5,2,0,47,0,pattern,3,pattern,3,none,3
+PC0121,Male,borderline glycemic markers,34,9,8,6,2,0,31,0,pattern,3,partial,2,not_applicable,0
+PC0122,Female,borderline glycemic markers,38,13,6,3,3,0,45,0,partial,2,pattern,3,none,2
+PC0123,Female,borderline glycemic markers,27,6,6,5,0,0,42,0,pattern,3,pattern,3,none,1
+PC0124,Male,borderline glycemic markers,28,6,6,5,0,1,35,0,pattern,5,pattern,3,not_applicable,0
+PC0125,Female,borderline glycemic markers,33,10,7,4,2,0,43,0,partial,2,pattern,3,none,2
+PC0126,Female,borderline glycemic markers,30,8,3,3,2,0,45,0,pattern,4,none,1,none,3
+PC0127,Male,borderline glycemic markers,30,6,7,5,0,0,31,0,pattern,3,pattern,3,not_applicable,0
+PC0128,Male,borderline glycemic markers,19,4,5,3,0,0,28,0,pattern,3,partial,2,not_applicable,0
+PC0129,Male,borderline glycemic markers,30,4,7,5,0,0,34,0,pattern,3,pattern,3,not_applicable,0
+PC0130,Male,borderline glycemic markers,26,5,7,3,0,0,36,0,pattern,3,pattern,3,not_applicable,0
+PC0131,Female,borderline glycemic markers,35,9,7,4,2,0,46,0,none,0,partial,2,none,0
+PC0132,Male,borderline glycemic markers,40,7,10,6,0,1,41,0,pattern,6,partial,2,not_applicable,0
+PC0133,Female,borderline glycemic markers,38,8,10,5,0,1,49,0,pattern,3,partial,2,none,3
+PC0134,Male,borderline glycemic markers,39,12,6,5,2,0,29,0,pattern,4,partial,2,not_applicable,0
+PC0135,Female,borderline glycemic markers,30,7,7,5,2,1,46,0,pattern,3,pattern,3,none,2
+PC0136,Male,borderline glycemic markers,36,7,8,6,0,0,36,0,pattern,4,pattern,3,not_applicable,0
+PC0137,Male,borderline glycemic markers,34,8,8,5,2,0,33,0,pattern,3,pattern,3,not_applicable,0
+PC0138,Female,borderline glycemic markers,42,9,9,5,4,1,51,0,partial,2,partial,2,none,2
+PC0139,Female,borderline glycemic markers,44,15,10,6,1,1,48,0,pattern,4,pattern,3,none,2
+PC0140,Female,borderline glycemic markers,43,12,8,6,3,0,46,0,pattern,3,pattern,3,none,2
+PC0141,Female,borderline glycemic markers,35,13,5,5,2,0,46,0,partial,2,partial,2,none,1
+PC0142,Female,borderline glycemic markers,29,6,7,3,1,0,45,0,partial,2,pattern,3,none,1
+PC0143,Female,borderline glycemic markers,27,1,8,4,0,1,48,0,pattern,3,pattern,3,none,2
+PC0144,Male,borderline glycemic markers,41,8,14,3,2,1,38,0,pattern,3,partial,2,not_applicable,0
+PC0145,Male,borderline glycemic markers,31,9,4,5,1,0,28,0,partial,2,partial,2,not_applicable,0
+PC0146,Male,borderline glycemic markers,44,12,6,7,2,1,34,0,pattern,3,partial,2,not_applicable,0
+PC0147,Female,borderline glycemic markers,27,6,5,4,1,0,47,0,pattern,3,pattern,3,none,2
+PC0148,Male,borderline glycemic markers,36,7,9,5,2,0,36,0,pattern,3,partial,2,not_applicable,0
+PC0149,Male,borderline glycemic markers,33,10,7,4,1,0,34,0,pattern,3,partial,2,not_applicable,0
+PC0150,Male,borderline glycemic markers,39,8,9,5,2,2,37,0,pattern,3,pattern,3,not_applicable,0
+PC0151,Male,borderline glycemic markers,32,7,8,5,1,0,34,0,pattern,3,partial,2,not_applicable,0
+PC0152,Female,borderline glycemic markers,36,10,12,4,0,0,48,0,pattern,3,pattern,3,none,2
+PC0153,Female,borderline glycemic markers,33,12,5,4,2,0,43,0,none,0,partial,2,none,0
+PC0154,Male,borderline glycemic markers,40,11,10,5,3,1,34,0,pattern,3,partial,2,not_applicable,0
+PC0155,Female,borderline glycemic markers,39,13,4,6,2,0,48,0,pattern,4,pattern,3,none,3
+PC0156,Female,borderline glycemic markers,30,6,9,5,0,0,44,0,pattern,5,partial,2,none,3
+PC0157,Male,borderline glycemic markers,41,10,8,4,2,1,38,0,pattern,3,partial,2,not_applicable,0
+PC0158,Male,borderline glycemic markers,32,11,3,4,1,0,30,0,none,1,pattern,3,not_applicable,0
+PC0159,Female,borderline glycemic markers,40,7,10,6,0,1,52,0,pattern,3,pattern,3,none,2
+PC0160,Male,borderline glycemic markers,33,10,6,5,0,0,36,0,pattern,4,pattern,3,not_applicable,0
+PC0161,Female,borderline glycemic markers,33,8,7,5,2,0,46,0,pattern,3,partial,2,none,2
+PC0162,Female,borderline glycemic markers,43,11,11,5,1,0,52,0,pattern,4,partial,2,none,3
+PC0163,Female,borderline glycemic markers,30,5,8,4,0,0,45,0,pattern,4,partial,2,none,1
+PC0164,Male,borderline glycemic markers,31,8,7,5,0,0,30,0,pattern,6,partial,2,not_applicable,0
+PC0165,Female,borderline glycemic markers,34,7,5,4,2,1,48,0,partial,2,pattern,3,none,1
+PC0166,Female,borderline glycemic markers,42,14,9,5,2,0,50,0,partial,2,partial,2,none,1
+PC0167,Male,borderline glycemic markers,34,5,10,6,1,1,35,0,pattern,4,partial,2,not_applicable,0
+PC0168,Male,borderline glycemic markers,38,9,12,3,1,0,38,0,pattern,3,partial,2,not_applicable,0
+PC0169,Male,borderline glycemic markers,20,2,9,3,0,0,28,0,pattern,4,partial,2,not_applicable,0
+PC0170,Male,borderline glycemic markers,47,11,12,5,2,1,41,0,pattern,4,partial,2,not_applicable,0
+PC0171,Male,borderline glycemic markers,32,7,10,4,2,0,37,0,partial,2,partial,2,not_applicable,0
+PC0172,Male,borderline glycemic markers,37,10,4,7,3,0,33,0,pattern,4,partial,2,not_applicable,0
+PC0173,Male,borderline glycemic markers,41,17,4,3,3,0,26,0,none,1,partial,2,not_applicable,0
+PC0174,Female,borderline glycemic markers,30,3,9,6,0,0,49,0,pattern,4,pattern,3,none,2
+PC0175,Female,borderline glycemic markers,39,13,7,5,2,1,48,0,partial,2,pattern,3,none,1
+PC0176,Male,borderline glycemic markers,32,5,8,5,0,1,31,0,pattern,3,partial,2,not_applicable,0
+PC0177,Male,borderline glycemic markers,32,10,9,5,2,0,30,0,pattern,3,partial,2,not_applicable,0
+PC0178,Female,borderline glycemic markers,31,9,4,4,2,0,43,0,partial,2,pattern,3,none,2
+PC0179,Female,borderline glycemic markers,36,11,5,5,2,0,47,0,pattern,4,partial,2,none,2
+PC0180,Male,borderline glycemic markers,37,13,3,4,3,0,25,0,partial,2,partial,2,not_applicable,0
+PC0181,Male,borderline glycemic markers,28,4,4,4,0,0,35,0,pattern,4,pattern,3,not_applicable,0
+PC0182,Male,borderline glycemic markers,29,8,1,4,3,0,28,0,pattern,3,partial,2,not_applicable,0
+PC0183,Female,borderline glycemic markers,47,14,10,5,2,0,49,0,pattern,3,pattern,3,none,2
+PC0184,Male,borderline glycemic markers,37,11,9,3,1,0,38,0,pattern,3,partial,2,not_applicable,0
+PC0185,Female,borderline glycemic markers,29,11,0,6,2,0,38,0,pattern,3,partial,2,none,3
+PC0186,Female,borderline glycemic markers,34,8,9,2,3,0,50,0,partial,2,partial,2,none,1
+PC0187,Female,borderline glycemic markers,29,2,7,5,0,0,50,0,pattern,4,partial,2,none,2
+PC0188,Female,borderline glycemic markers,29,9,4,4,1,0,45,0,partial,2,partial,2,none,2
+PC0189,Male,borderline glycemic markers,43,13,10,6,2,1,36,0,pattern,3,pattern,3,not_applicable,0
+PC0190,Male,borderline glycemic markers,43,12,13,4,2,1,41,0,pattern,3,partial,2,not_applicable,0
+PC0191,Male,borderline glycemic markers,44,12,8,5,2,0,38,0,pattern,4,pattern,3,not_applicable,0
+PC0192,Female,borderline glycemic markers,34,10,5,4,1,0,47,0,pattern,3,partial,2,none,2
+PC0193,Male,borderline glycemic markers,37,10,9,4,1,0,33,0,partial,2,partial,2,not_applicable,0
+PC0194,Male,borderline glycemic markers,41,14,6,7,1,0,38,0,partial,2,partial,2,not_applicable,0
+PC0195,Male,borderline glycemic markers,21,8,3,3,2,0,18,0,partial,2,partial,2,not_applicable,0
+PC0196,Male,borderline glycemic markers,38,13,5,3,4,0,31,0,none,1,partial,2,not_applicable,0
+PC0197,Male,borderline glycemic markers,42,14,6,5,1,0,33,0,pattern,4,partial,2,not_applicable,0
+PC0198,Female,borderline glycemic markers,29,9,4,6,1,0,41,0,partial,2,partial,2,none,2
+PC0199,Male,borderline glycemic markers,29,7,6,6,0,0,24,0,pattern,4,partial,2,not_applicable,0
+PC0200,Female,borderline glycemic markers,37,13,3,5,2,0,46,0,pattern,3,pattern,3,none,2
+PC0301,Male,hypertension | hyperlipidemia | prediabetes,39,1,12,7,0,2,44,0,pattern,3,partial,2,not_applicable,0
+PC0302,Male,,22,0,10,5,0,1,40,0,partial,2,partial,2,not_applicable,0
+PC0303,Female,pcos,29,1,12,3,0,1,54,0,partial,2,partial,2,pattern,3
+PC0304,Female,gerd | hypothyroidism | vitamin d insufficiency,31,4,10,7,0,0,54,0,none,1,partial,2,none,1
+PC0305,Female,prediabetes | migraine | hypothyroidism | iron deficiency,39,1,10,7,0,3,67,0,pattern,3,none,1,none,2
+PC0306,Female,migraine,34,2,18,4,0,0,57,0,partial,2,partial,2,not_applicable,0
+PC0307,Male,hypertension,31,2,11,7,0,0,47,0,pattern,3,partial,2,not_applicable,0
+PC0308,Female,,24,1,11,7,0,0,51,0,none,0,none,1,none,1
+PC0309,Female,hypothyroidism | iron deficiency | migraine | gerd,40,0,16,7,0,2,52,0,none,1,pattern,3,not_applicable,0
+PC0310,Male,gerd,25,0,13,4,0,1,37,0,none,1,partial,2,not_applicable,0
+PC0311,Female,vitamin d insufficiency | iron deficiency | hypothyroidism,42,2,18,8,0,0,61,0,pattern,3,none,1,none,3
+PC0312,Male,,28,0,11,6,0,1,50,0,none,1,none,1,not_applicable,0
+PC0313,Female,hypothyroidism | pcos | iron deficiency | vitamin d insufficiency,38,0,12,8,0,0,51,0,none,0,none,1,partial,1
+PC0314,Male,,29,2,14,6,0,3,38,0,partial,2,none,1,not_applicable,0
+PC0315,Male,,23,2,11,3,0,0,34,0,none,0,partial,2,not_applicable,0
+PC0316,Male,prediabetes,32,0,15,5,0,2,50,0,partial,2,partial,2,not_applicable,0
+PC0317,Male,prediabetes | hyperlipidemia,40,0,16,7,0,1,51,0,pattern,3,none,1,not_applicable,0
+PC0318,Male,prediabetes | hypertension,43,1,18,8,0,1,47,0,partial,2,partial,2,not_applicable,0
+PC0319,Male,asthma,20,0,10,2,0,0,44,0,none,1,none,1,not_applicable,0
+PC0320,Female,hyperlipidemia | migraine | hypertension,39,0,16,7,0,0,55,0,none,1,partial,2,not_applicable,0
+PC0321,Male,,24,0,11,5,0,0,45,0,none,0,partial,2,not_applicable,0
+PC0322,Male,,36,1,20,6,0,1,51,0,none,1,partial,2,not_applicable,0
+PC0323,Female,asthma | hypertension | gerd | hypothyroidism,42,4,15,7,1,0,51,0,none,1,partial,2,not_applicable,0
+PC0324,Female,hypertension,43,3,20,6,1,2,57,0,none,1,none,1,not_applicable,0
+PC0325,Male,,33,0,18,4,0,3,52,0,none,1,partial,2,not_applicable,0
+PC0326,Female,hypothyroidism | hyperlipidemia,46,2,21,9,0,0,54,0,none,0,pattern,3,not_applicable,0
+PC0327,Male,hypertension,37,1,19,4,0,1,50,0,none,0,none,1,not_applicable,0
+PC0328,Male,,25,0,14,7,0,0,37,0,none,1,none,1,not_applicable,0
+PC0329,Female,hypertension | vitamin d insufficiency,33,2,12,6,0,0,38,0,partial,2,partial,2,not_applicable,0
+PC0330,Male,type 2 diabetes,32,0,11,7,0,0,54,0,partial,2,pattern,3,not_applicable,0
+PC0331,Female,vitamin d insufficiency | migraine | iron deficiency,36,4,13,6,0,1,58,0,none,1,none,1,none,1
+PC0332,Male,gerd,26,0,14,5,0,0,45,0,partial,2,partial,2,not_applicable,0
+PC0333,Male,migraine | hypertension | gerd,36,3,15,4,0,1,46,0,none,1,partial,2,not_applicable,0
+PC0334,Female,vitamin d insufficiency,35,1,14,7,0,2,68,0,partial,2,partial,2,none,3
+PC0335,Male,asthma,37,1,20,5,0,2,58,0,none,0,pattern,3,not_applicable,0
+PC0336,Female,prediabetes | hypothyroidism,41,4,17,6,0,1,68,0,pattern,4,none,1,none,2
+PC0337,Female,prediabetes | hypertension | hypothyroidism | vitamin d insufficiency,42,1,12,7,0,1,46,0,pattern,3,partial,2,not_applicable,0
+PC0338,Male,hypertension | asthma | prediabetes,36,0,13,4,0,2,52,0,pattern,3,pattern,3,not_applicable,0
+PC0339,Female,hypertension | migraine,33,2,12,6,0,1,59,0,none,1,pattern,3,none,2
+PC0340,Female,iron deficiency,25,2,8,4,0,0,61,0,partial,2,none,1,none,2
+PC0341,Male,hypertension,28,1,11,3,0,0,51,0,none,1,pattern,3,not_applicable,0
+PC0342,Female,iron deficiency | hypertension,32,2,7,5,0,1,49,0,none,1,partial,2,not_applicable,0
+PC0343,Male,,21,1,14,2,0,1,38,0,none,0,none,1,not_applicable,0
+PC0344,Female,hypertension | hypothyroidism | type 2 diabetes,37,1,17,2,0,1,44,0,partial,2,partial,2,not_applicable,0
+PC0345,Male,hypertension,33,4,14,4,0,0,50,0,none,1,partial,2,not_applicable,0
+PC0346,Female,hypothyroidism,32,3,14,6,0,1,61,0,pattern,3,none,1,none,3
+PC0347,Male,,24,2,11,6,0,0,36,0,none,1,partial,2,not_applicable,0
+PC0348,Male,,29,2,14,5,0,0,42,0,none,1,none,1,not_applicable,0
+PC0349,Female,iron deficiency | gerd | hyperlipidemia | hypothyroidism,34,2,13,4,0,1,71,0,none,1,partial,2,none,2
+PC0350,Female,vitamin d insufficiency | hypothyroidism,40,7,10,8,0,0,65,0,pattern,3,pattern,3,none,3
+PC0351,Male,hypertension | hyperlipidemia,33,2,13,4,0,0,46,0,partial,2,pattern,3,not_applicable,0
+PC0352,Female,vitamin d insufficiency,42,3,22,5,0,2,71,0,none,0,partial,2,none,1
+PC0353,Female,vitamin d insufficiency | iron deficiency,36,2,15,6,0,1,59,0,partial,2,none,0,none,2
+PC0354,Male,hyperlipidemia | hypertension,30,1,13,5,0,0,40,0,none,0,partial,2,not_applicable,0
+PC0355,Female,hypothyroidism | vitamin d insufficiency | hypertension | prediabetes,53,4,21,9,0,1,57,0,pattern,3,partial,2,not_applicable,0
+PC0356,Male,prediabetes | gerd | hypertension | hyperlipidemia,51,3,19,5,0,1,66,0,pattern,3,pattern,4,not_applicable,0
+PC0357,Female,hyperlipidemia | vitamin d insufficiency | asthma | migraine,39,2,12,7,0,1,55,0,pattern,3,none,1,not_applicable,0
+PC0358,Male,prediabetes,29,0,12,5,0,0,54,0,pattern,3,partial,2,not_applicable,0
+PC0359,Male,hyperlipidemia | prediabetes,36,0,13,8,0,0,47,0,partial,2,partial,2,not_applicable,0
+PC0360,Female,iron deficiency,23,1,9,6,0,0,54,0,partial,2,none,0,none,3
+PC0361,Male,hypertension | migraine | asthma,39,2,14,6,0,3,55,0,none,1,pattern,3,not_applicable,0
+PC0362,Female,migraine | hypothyroidism | asthma,37,1,14,9,0,2,61,0,none,0,none,0,none,0
+PC0363,Female,hypertension,27,1,11,5,0,0,44,0,none,1,pattern,3,not_applicable,0
+PC0364,Male,,35,1,20,4,0,3,50,0,none,1,partial,2,not_applicable,0
+PC0365,Male,gerd,25,0,12,6,0,0,40,0,partial,2,partial,2,not_applicable,0
+PC0366,Female,asthma | hypertension | iron deficiency,28,0,8,6,0,0,42,0,pattern,3,partial,2,not_applicable,0
+PC0367,Female,vitamin d insufficiency | iron deficiency,36,1,12,8,0,0,50,0,partial,2,partial,2,not_applicable,0
+PC0368,Male,hyperlipidemia,38,2,18,6,0,0,48,0,partial,2,pattern,3,not_applicable,0
+PC0369,Female,migraine | hyperlipidemia,33,0,11,7,0,0,46,0,pattern,3,partial,2,not_applicable,0
+PC0370,Male,gerd,29,0,15,5,0,1,46,0,none,0,partial,2,not_applicable,0
+PC0371,Female,iron deficiency,42,5,17,6,0,2,72,0,partial,2,partial,2,none,2
+PC0372,Female,hypothyroidism | asthma | iron deficiency,31,2,11,7,0,1,54,0,none,1,none,1,none,1
+PC0373,Female,vitamin d insufficiency | migraine | hypothyroidism,34,4,9,6,0,0,60,0,partial,2,partial,2,none,3
+PC0374,Female,iron deficiency | vitamin d insufficiency | gerd,41,1,15,6,0,2,69,0,partial,2,partial,2,none,1
+PC0375,Female,,32,1,14,5,0,3,66,0,pattern,3,partial,2,none,3
+PC0376,Female,vitamin d insufficiency | migraine,32,1,13,8,0,1,54,0,partial,2,none,1,none,3
+PC0377,Female,hypothyroidism | hypertension | type 2 diabetes | iron deficiency,43,0,13,7,0,0,58,0,pattern,3,none,1,not_applicable,0
+PC0378,Male,,26,1,10,6,0,1,48,0,none,1,none,1,not_applicable,0
+PC0379,Male,hypertension | asthma,37,2,15,5,0,1,53,0,pattern,3,partial,2,not_applicable,0
+PC0380,Female,prediabetes | vitamin d insufficiency | gerd,39,0,15,8,0,2,52,0,partial,2,partial,2,not_applicable,0
+PC0381,Female,gerd | iron deficiency | hypothyroidism | prediabetes,53,5,20,9,0,1,74,0,pattern,3,partial,2,none,3
+PC0382,Female,hyperlipidemia | iron deficiency,32,3,15,3,0,0,49,0,pattern,3,none,1,not_applicable,0
+PC0383,Female,iron deficiency | hypothyroidism,32,4,11,6,0,1,38,0,none,1,none,1,not_applicable,0
+PC0384,Female,migraine | vitamin d insufficiency,29,3,11,5,0,0,65,0,none,0,none,1,none,1
+PC0385,Male,hyperlipidemia | migraine,32,1,13,4,0,1,55,0,partial,2,partial,2,not_applicable,0
+PC0386,Male,hyperlipidemia | hypertension | gerd,29,1,6,7,0,0,41,0,none,1,partial,2,not_applicable,0
+PC0387,Female,hypothyroidism | hyperlipidemia,41,3,19,5,0,1,56,0,none,0,partial,2,not_applicable,0
+PC0388,Male,,32,2,15,8,0,2,42,0,none,0,none,1,not_applicable,0
+PC0389,Male,prediabetes,39,3,14,8,0,2,51,0,pattern,3,none,1,not_applicable,0
+PC0390,Male,migraine,33,0,16,6,0,1,58,0,partial,2,partial,2,not_applicable,0
+PC0391,Male,,28,1,14,6,0,2,43,0,none,1,none,1,not_applicable,0
+PC0392,Female,hypothyroidism | iron deficiency | migraine | vitamin d insufficiency,36,3,10,7,0,1,53,0,none,0,none,1,none,1
+PC0393,Female,asthma | iron deficiency,37,2,16,6,0,1,64,0,partial,2,none,1,none,3
+PC0394,Male,hypertension | type 2 diabetes,26,1,6,5,0,0,32,0,partial,2,partial,2,not_applicable,0
+PC0395,Female,type 2 diabetes | iron deficiency | vitamin d insufficiency | hypertension,39,2,12,5,0,1,44,0,partial,2,none,1,not_applicable,0
+PC0396,Female,migraine | asthma,35,3,14,6,0,0,67,0,none,1,partial,2,none,1
+PC0397,Female,iron deficiency | type 2 diabetes | hyperlipidemia,34,0,12,6,0,0,56,0,partial,2,pattern,3,not_applicable,0
+PC0398,Female,hypothyroidism | vitamin d insufficiency | iron deficiency | hyperlipidemia,48,4,16,9,0,1,59,0,none,0,partial,2,not_applicable,0
+PC0399,Female,hyperlipidemia | gerd | hypertension | iron deficiency,46,1,16,7,0,2,53,0,none,0,partial,2,not_applicable,0
+PC0400,Female,,32,3,18,6,0,0,43,0,partial,2,partial,2,not_applicable,0
+PC0401,Female,iron deficiency,36,1,16,9,0,1,59,0,none,1,none,1,none,2
+PC0402,Female,hypothyroidism | hypertension,35,1,14,6,0,2,43,0,none,1,partial,2,not_applicable,0
+PC0403,Male,asthma | hyperlipidemia,30,0,14,4,0,1,50,0,none,0,partial,2,not_applicable,0
+PC0404,Male,hypertension,29,0,13,7,0,0,44,0,none,1,partial,2,not_applicable,0
+PC0405,Male,asthma,28,1,12,6,0,1,47,0,partial,2,none,0,not_applicable,0
+PC0406,Male,asthma,29,0,14,7,0,1,47,0,partial,2,partial,2,not_applicable,0
+PC0407,Female,,31,0,16,6,0,1,48,0,none,0,none,1,not_applicable,0
+PC0408,Male,,26,0,15,3,0,0,43,0,none,1,pattern,3,not_applicable,0
+PC0409,Male,hyperlipidemia,34,1,18,5,0,1,47,0,none,0,none,1,not_applicable,0
+PC0410,Female,,26,0,16,3,0,1,40,0,none,1,partial,2,not_applicable,0
+PC0411,Female,hypothyroidism,27,4,7,6,0,0,57,0,partial,2,partial,2,none,2
+PC0412,Female,hypertension | asthma | hyperlipidemia,36,2,15,4,0,1,48,0,none,0,pattern,3,not_applicable,0
+PC0413,Female,,31,1,17,6,0,1,59,0,partial,2,partial,2,none,2
+PC0414,Male,,26,0,11,5,0,2,43,0,none,1,none,1,not_applicable,0
+PC0415,Male,gerd | migraine | prediabetes,41,0,19,8,0,1,51,0,pattern,3,partial,2,not_applicable,0
+PC0416,Male,migraine,28,4,14,3,0,0,38,0,none,0,partial,2,not_applicable,0
+PC0417,Male,prediabetes,30,0,14,6,0,2,44,0,pattern,3,partial,2,not_applicable,0
+PC0418,Female,hypothyroidism | hypertension,40,1,14,8,0,2,53,0,none,1,pattern,4,not_applicable,0
+PC0419,Male,,31,1,17,3,0,1,55,0,none,1,partial,2,not_applicable,0
+PC0420,Male,,31,4,17,4,0,1,44,0,pattern,3,none,1,not_applicable,0
+PC0421,Male,type 2 diabetes,32,3,7,6,0,1,48,0,pattern,3,partial,2,not_applicable,0
+PC0422,Male,prediabetes | migraine,36,1,18,4,0,0,53,0,partial,2,partial,2,not_applicable,0
+PC0423,Female,pcos | hypothyroidism,31,1,12,5,0,1,48,0,none,0,none,1,partial,1
+PC0424,Female,hyperlipidemia,37,7,10,9,0,0,42,0,partial,2,pattern,3,not_applicable,0
+PC0425,Female,,32,3,17,6,0,1,56,0,partial,2,none,0,none,2
+PC0426,Male,,29,3,17,3,0,0,46,0,none,1,none,0,not_applicable,0
+PC0427,Male,hyperlipidemia | hypertension,35,0,14,5,0,1,48,0,none,1,pattern,3,not_applicable,0
+PC0428,Male,hypertension,37,1,17,4,0,2,53,0,none,0,pattern,3,not_applicable,0
+PC0429,Male,hypertension | hyperlipidemia,37,1,16,4,0,2,52,0,none,1,pattern,3,not_applicable,0
+PC0430,Male,prediabetes,35,1,18,4,0,3,59,0,pattern,3,none,1,not_applicable,0
+PC0431,Female,hypertension | asthma | prediabetes,36,0,13,6,0,0,64,0,pattern,3,pattern,3,none,2
+PC0432,Female,iron deficiency | hypertension,35,2,15,4,0,1,45,0,none,1,partial,2,not_applicable,0
+PC0433,Male,migraine | hypertension | prediabetes,31,0,8,6,0,0,46,0,partial,2,partial,2,not_applicable,0
+PC0434,Male,prediabetes,30,0,13,5,0,0,44,0,partial,2,none,0,not_applicable,0
+PC0435,Male,migraine,29,0,11,5,0,0,53,0,none,1,pattern,3,not_applicable,0
+PC0436,Female,vitamin d insufficiency | hypertension | hypothyroidism | hyperlipidemia,48,5,19,5,0,1,64,0,none,0,pattern,3,none,1
+PC0437,Female,iron deficiency | pcos,41,3,14,8,0,1,55,0,none,1,partial,2,partial,2
+PC0438,Male,hypertension,36,1,18,4,0,1,55,0,partial,2,pattern,3,not_applicable,0
+PC0439,Male,hypertension | hyperlipidemia,50,2,22,8,0,1,66,0,partial,2,partial,2,not_applicable,0
+PC0440,Male,,28,0,17,6,0,1,45,0,none,0,partial,2,not_applicable,0
+PC0441,Female,prediabetes | asthma | hypothyroidism,42,0,16,6,0,3,71,0,partial,2,partial,2,none,2
+PC0442,Male,hyperlipidemia | hypertension | prediabetes,42,1,16,4,0,2,46,0,partial,2,pattern,4,not_applicable,0
+PC0443,Female,pcos | iron deficiency | hypothyroidism,44,2,14,8,0,0,70,0,partial,2,partial,2,pattern,3
+PC0444,Male,hypertension,31,0,13,8,0,1,37,0,none,1,none,1,not_applicable,0
+PC0445,Female,vitamin d insufficiency | iron deficiency,31,2,13,6,0,0,64,0,none,1,none,1,none,1
+PC0446,Female,hyperlipidemia | migraine | iron deficiency,36,1,12,5,0,0,49,0,partial,2,pattern,3,not_applicable,0
+PC0447,Female,iron deficiency | prediabetes | hyperlipidemia | hypothyroidism,42,2,11,6,0,0,56,0,partial,2,pattern,3,not_applicable,0
+PC0448,Male,prediabetes,25,0,9,6,0,1,48,0,pattern,4,none,1,not_applicable,0
+PC0449,Female,iron deficiency | pcos,34,0,11,7,0,1,63,0,partial,2,partial,2,pattern,3
+PC0450,Male,,30,1,11,8,0,0,47,0,pattern,3,partial,2,not_applicable,0
+PC0451,Male,hypertension,36,0,15,7,0,0,56,0,partial,2,pattern,3,not_applicable,0
+PC0452,Female,prediabetes | iron deficiency | hyperlipidemia,50,2,19,7,0,2,77,0,partial,2,partial,2,none,2
+PC0453,Male,,33,1,17,6,0,2,54,0,pattern,3,none,1,not_applicable,0
+PC0454,Female,asthma | hypertension | hypothyroidism,40,1,14,9,0,1,69,0,partial,2,pattern,3,none,3
+PC0455,Male,hypertension,26,0,10,4,0,0,43,0,partial,2,pattern,3,not_applicable,0
+PC0456,Male,,32,0,18,4,0,1,52,0,none,1,partial,2,not_applicable,0
+PC0457,Female,borderline glycemic markers,35,1,12,6,0,1,58,0,pattern,3,partial,2,none,2
+PC0458,Male,borderline glycemic markers,34,2,15,3,0,1,51,0,none,0,pattern,3,not_applicable,0
+PC0459,Male,borderline glycemic markers,22,0,12,5,0,0,35,0,partial,2,none,1,not_applicable,0
+PC0460,Female,borderline glycemic markers,28,2,11,5,0,0,58,0,none,0,partial,2,none,0
+PC0461,Female,borderline glycemic markers,29,0,10,6,0,1,58,0,partial,2,none,1,none,2
+PC0462,Male,borderline glycemic markers,30,0,18,4,0,2,43,0,none,1,partial,2,not_applicable,0
+PC0463,Female,borderline glycemic markers,24,0,14,3,0,0,38,0,none,1,none,1,not_applicable,0
+PC0464,Female,borderline glycemic markers,28,2,9,6,0,0,46,0,none,1,partial,2,not_applicable,0
+PC0465,Male,borderline glycemic markers,30,2,17,5,0,1,39,0,none,0,none,1,not_applicable,0
+PC0466,Female,borderline glycemic markers,34,3,11,6,0,1,43,0,partial,2,partial,2,partial,2
+PC0467,Male,borderline glycemic markers,23,0,12,4,0,1,37,0,none,0,none,1,not_applicable,0
+PC0468,Female,borderline glycemic markers,35,2,20,4,0,1,60,0,none,1,none,0,none,1
+PC0469,Male,borderline glycemic markers,25,0,14,3,0,1,43,0,partial,2,partial,2,not_applicable,0
+PC0470,Female,borderline glycemic markers,28,0,14,3,0,1,53,0,none,1,partial,2,none,2
+PC0471,Male,borderline glycemic markers,27,1,11,5,0,2,39,0,none,1,partial,2,not_applicable,0
+PC0472,Male,borderline glycemic markers,25,2,8,5,0,0,44,0,partial,2,partial,2,not_applicable,0
+PC0473,Male,borderline glycemic markers,29,1,11,6,0,0,40,0,partial,2,none,1,not_applicable,0
+PC0474,Female,borderline glycemic markers,38,2,17,6,0,1,52,0,pattern,3,partial,2,not_applicable,0
+PC0475,Male,borderline glycemic markers,31,3,15,4,0,0,50,0,partial,2,none,1,not_applicable,0
+PC0476,Female,borderline glycemic markers,30,1,11,7,0,1,35,0,none,1,none,1,not_applicable,0
+PC0477,Male,borderline glycemic markers,22,0,12,4,0,0,34,0,partial,2,none,1,not_applicable,0
+PC0478,Male,borderline glycemic markers,29,2,14,4,0,3,36,0,none,1,none,1,not_applicable,0
+PC0479,Male,borderline glycemic markers,25,1,14,3,0,1,40,0,partial,2,partial,2,not_applicable,0
+PC0480,Male,borderline glycemic markers,33,2,16,4,0,2,49,0,none,1,none,1,not_applicable,0
+PC0481,Male,borderline glycemic markers,30,3,16,4,0,1,38,0,none,1,partial,2,not_applicable,0
+PC0482,Male,borderline glycemic markers,30,1,13,5,0,2,36,0,none,1,partial,2,not_applicable,0
+PC0483,Male,borderline glycemic markers,32,2,16,3,0,1,40,0,partial,2,none,1,not_applicable,0
+PC0484,Female,borderline glycemic markers,28,0,15,3,0,2,62,0,none,1,partial,2,none,1
+PC0485,Female,borderline glycemic markers,22,0,11,4,0,1,54,0,none,0,none,1,none,0
+PC0486,Female,borderline glycemic markers,36,1,17,5,0,1,61,0,none,1,pattern,3,none,2
+PC0487,Female,borderline glycemic markers,29,1,13,3,0,1,54,0,partial,2,partial,2,none,1
+PC0488,Female,borderline glycemic markers,38,3,13,6,0,0,51,0,pattern,3,pattern,3,not_applicable,0
+PC0489,Female,borderline glycemic markers,32,2,17,5,0,2,54,0,none,0,pattern,3,none,0
+PC0490,Male,borderline glycemic markers,25,2,8,3,0,0,32,0,partial,2,none,1,not_applicable,0
+PC0491,Female,borderline glycemic markers,29,2,15,7,0,0,51,0,partial,2,none,1,none,2
+PC0492,Male,borderline glycemic markers,30,1,18,2,0,3,43,0,none,0,none,1,not_applicable,0
+PC0493,Male,borderline glycemic markers,27,2,13,4,0,1,36,0,partial,2,none,1,not_applicable,0
+PC0494,Female,borderline glycemic markers,30,1,12,4,0,0,61,0,none,1,pattern,3,none,1
+PC0495,Female,borderline glycemic markers,35,1,17,5,0,3,48,0,partial,2,none,1,partial,2
+PC0496,Female,borderline glycemic markers,36,0,18,5,0,3,65,0,none,1,partial,2,none,2
+PC0497,Male,borderline glycemic markers,28,2,11,5,0,2,44,0,none,1,partial,2,not_applicable,0
+PC0498,Male,borderline glycemic markers,33,1,16,6,0,1,51,0,pattern,3,partial,2,not_applicable,0
+PC0499,Male,borderline glycemic markers,39,0,19,5,0,3,57,0,pattern,3,partial,2,not_applicable,0
+PC0500,Male,borderline glycemic markers,28,3,9,4,0,0,44,0,partial,2,partial,2,not_applicable,0
+PC0501,Male,borderline glycemic markers,28,2,11,6,0,1,40,0,partial,2,partial,2,not_applicable,0
+PC0502,Male,borderline glycemic markers,34,2,15,6,0,2,44,0,partial,2,partial,2,not_applicable,0
+PC0503,Male,borderline glycemic markers,25,0,11,5,0,0,39,0,partial,2,partial,2,not_applicable,0
+PC0504,Female,borderline glycemic markers,36,3,19,3,0,1,53,0,pattern,3,none,1,not_applicable,0
+PC0505,Male,borderline glycemic markers,20,3,8,2,0,0,34,0,none,0,partial,2,not_applicable,0
+PC0506,Male,borderline glycemic markers,26,0,12,4,0,1,45,0,partial,2,pattern,3,not_applicable,0
+PC0507,Male,borderline glycemic markers,22,0,12,4,0,0,36,0,partial,2,none,1,not_applicable,0
+PC0508,Male,borderline glycemic markers,23,1,13,3,0,0,40,0,none,1,none,1,not_applicable,0
+PC0509,Female,borderline glycemic markers,44,1,19,7,0,1,52,0,partial,2,partial,2,not_applicable,0
+PC0510,Female,borderline glycemic markers,35,1,16,4,0,1,49,0,none,1,partial,2,not_applicable,0
+PC0511,Female,borderline glycemic markers,35,1,16,6,0,0,63,0,pattern,3,partial,2,none,2
+PC0512,Female,borderline glycemic markers,29,1,14,4,0,1,63,0,partial,2,pattern,3,none,2
+PC0513,Male,borderline glycemic markers,35,2,15,5,0,2,40,0,none,0,partial,2,not_applicable,0
+PC0514,Male,borderline glycemic markers,33,2,17,5,0,3,38,0,partial,2,partial,2,not_applicable,0
+PC0515,Male,borderline glycemic markers,36,0,20,3,0,2,56,0,partial,2,partial,2,not_applicable,0
+PC0516,Male,borderline glycemic markers,30,0,16,3,0,1,40,0,partial,2,partial,2,not_applicable,0
+PC0517,Male,borderline glycemic markers,27,1,9,4,0,0,45,0,pattern,3,pattern,3,not_applicable,0
+PC0518,Male,borderline glycemic markers,29,1,15,6,0,0,44,0,partial,2,none,1,not_applicable,0
+PC0519,Female,borderline glycemic markers,24,0,11,3,0,0,50,0,none,0,partial,2,none,0
+PC0520,Male,borderline glycemic markers,30,0,12,5,0,0,47,0,pattern,3,partial,2,not_applicable,0
+PC0521,Male,borderline glycemic markers,28,3,10,4,0,1,34,0,partial,2,none,1,not_applicable,0
+PC0522,Female,borderline glycemic markers,33,5,18,5,0,0,43,0,none,1,none,1,not_applicable,0
+PC0523,Female,borderline glycemic markers,26,2,12,2,0,1,62,0,pattern,3,partial,2,none,3
+PC0524,Male,borderline glycemic markers,27,3,13,2,0,0,41,0,partial,2,none,1,not_applicable,0
+PC0525,Female,borderline glycemic markers,25,1,13,3,0,0,60,0,partial,2,partial,2,none,2
+PC0526,Male,borderline glycemic markers,34,2,15,4,0,0,50,0,none,0,partial,2,not_applicable,0
+PC0527,Female,borderline glycemic markers,32,0,18,4,0,1,52,0,none,1,partial,2,not_applicable,0
+PC0528,Female,borderline glycemic markers,36,3,18,4,0,1,62,0,pattern,3,none,1,none,4
+PC0529,Male,borderline glycemic markers,28,0,13,6,0,0,43,0,pattern,3,none,1,not_applicable,0
+PC0530,Male,borderline glycemic markers,35,2,15,6,0,1,44,0,none,0,partial,2,not_applicable,0
+PC0531,Male,borderline glycemic markers,39,2,19,3,0,2,51,0,pattern,3,pattern,3,not_applicable,0
+PC0532,Female,borderline glycemic markers,31,0,20,3,0,2,47,0,none,1,none,0,not_applicable,0
+PC0533,Male,borderline glycemic markers,33,4,17,6,0,1,38,0,pattern,3,none,1,not_applicable,0
+PC0534,Male,borderline glycemic markers,28,1,17,3,0,2,41,0,none,1,partial,2,not_applicable,0
+PC0535,Male,borderline glycemic markers,27,0,15,4,0,2,41,0,none,0,none,1,not_applicable,0
+PC0536,Female,borderline glycemic markers,29,2,14,4,0,0,42,0,partial,2,pattern,3,not_applicable,0
+PC0537,Male,borderline glycemic markers,26,0,15,4,0,1,39,0,pattern,3,partial,2,not_applicable,0
+PC0538,Male,borderline glycemic markers,29,2,12,7,0,0,39,0,partial,2,pattern,3,not_applicable,0
+PC0539,Male,borderline glycemic markers,30,2,17,2,0,2,45,0,partial,2,partial,2,not_applicable,0
+PC0540,Male,borderline glycemic markers,38,1,19,5,0,1,53,0,partial,2,partial,2,not_applicable,0
+PC0541,Female,borderline glycemic markers,35,3,12,7,0,0,46,0,pattern,4,partial,2,not_applicable,0
+PC0542,Female,borderline glycemic markers,31,1,11,7,0,0,46,0,pattern,3,partial,2,not_applicable,0
+PC0543,Female,borderline glycemic markers,41,0,20,8,0,3,51,0,partial,2,partial,2,not_applicable,0
+PC0544,Female,borderline glycemic markers,14,0,3,5,0,0,41,0,none,1,none,1,none,1
+PC0545,Female,borderline glycemic markers,36,4,14,7,0,0,60,0,none,1,partial,2,none,1
+PC0546,Female,borderline glycemic markers,22,0,11,4,0,0,52,0,none,1,none,1,none,1
+PC0547,Male,borderline glycemic markers,24,0,14,4,0,0,37,0,none,1,none,1,not_applicable,0
+PC0548,Female,borderline glycemic markers,27,2,15,2,0,0,42,0,none,0,partial,2,not_applicable,0
+PC0549,Female,borderline glycemic markers,41,1,21,5,0,2,52,0,partial,2,pattern,3,not_applicable,0
+PC0550,Male,borderline glycemic markers,30,1,15,3,0,1,38,0,none,1,partial,2,not_applicable,0
+PC0551,Female,borderline glycemic markers,28,3,7,5,0,0,36,0,none,1,partial,2,not_applicable,0
+PC0552,Female,borderline glycemic markers,43,3,20,4,0,1,52,0,none,1,pattern,4,not_applicable,0
+PC0553,Female,borderline glycemic markers,25,3,9,6,0,0,32,0,partial,2,none,1,not_applicable,0
+PC0554,Female,borderline glycemic markers,29,2,14,4,1,2,52,0,none,0,none,1,none,1
+PC0555,Female,borderline glycemic markers,31,0,11,5,0,0,50,0,none,1,pattern,3,not_applicable,0
+PC0556,Female,borderline glycemic markers,19,0,12,3,0,0,46,0,none,0,none,1,none,0
+PC0557,Male,borderline glycemic markers,25,1,12,6,0,1,40,0,pattern,3,none,1,not_applicable,0
+PC0558,Male,borderline glycemic markers,26,1,12,3,0,1,48,0,partial,2,partial,2,not_applicable,0
+PC0559,Male,borderline glycemic markers,27,1,9,5,0,2,34,0,partial,2,pattern,3,not_applicable,0
+PC0560,Female,borderline glycemic markers,28,2,8,5,0,0,47,0,pattern,3,none,0,pattern,3
+PC0561,Female,borderline glycemic markers,34,1,18,4,0,2,66,0,none,0,pattern,3,none,1
+PC0562,Female,borderline glycemic markers,22,0,12,3,0,0,39,0,partial,2,partial,2,not_applicable,0
+PC0563,Female,borderline glycemic markers,37,0,22,3,0,3,48,0,none,0,partial,2,not_applicable,0
+PC0564,Female,borderline glycemic markers,31,3,18,4,0,1,54,0,none,0,none,1,none,0
+PC0565,Female,borderline glycemic markers,31,0,15,8,0,0,60,0,none,1,partial,2,none,2
+PC0566,Male,borderline glycemic markers,31,0,15,5,0,2,47,0,partial,2,pattern,3,not_applicable,0
+PC0567,Male,borderline glycemic markers,27,0,15,6,0,2,36,0,partial,2,none,0,not_applicable,0
+PC0568,Female,borderline glycemic markers,32,2,14,4,0,1,38,0,none,1,pattern,3,not_applicable,0
+PC0569,Female,borderline glycemic markers,33,4,12,6,0,0,52,0,none,1,partial,2,none,1
+PC0570,Male,borderline glycemic markers,31,0,12,7,0,1,36,0,pattern,4,none,0,not_applicable,0
+PC0571,Male,borderline glycemic markers,28,1,12,5,0,0,46,0,partial,2,partial,2,not_applicable,0
+PC0572,Female,borderline glycemic markers,35,3,12,6,0,0,52,0,none,1,partial,2,partial,2
+PC0573,Female,borderline glycemic markers,31,2,11,4,0,0,44,0,none,1,pattern,3,not_applicable,0
+PC0574,Male,borderline glycemic markers,31,0,13,5,0,0,37,0,partial,2,pattern,3,not_applicable,0
+PC0575,Female,borderline glycemic markers,26,1,14,4,0,2,49,0,none,1,none,1,none,1
+PC0576,Male,borderline glycemic markers,25,0,14,5,0,0,35,0,none,1,none,1,not_applicable,0
+PC0577,Female,borderline glycemic markers,32,0,17,3,0,2,54,0,partial,2,partial,2,none,2
+PC0578,Female,borderline glycemic markers,25,1,9,5,0,0,41,0,none,0,none,1,partial,1
+PC0579,Male,borderline glycemic markers,23,0,8,4,0,0,35,0,none,1,pattern,3,not_applicable,0
+PC0580,Male,borderline glycemic markers,32,2,13,5,0,2,46,0,pattern,3,partial,2,not_applicable,0
+PC0581,Female,borderline glycemic markers,26,0,14,4,0,0,63,0,partial,2,partial,2,none,2
+PC0582,Male,borderline glycemic markers,31,4,12,5,0,0,39,0,partial,2,pattern,3,not_applicable,0
+PC0583,Male,borderline glycemic markers,32,0,15,6,0,1,42,0,none,1,pattern,3,not_applicable,0
+PC0584,Male,borderline glycemic markers,26,2,11,2,0,0,41,0,none,0,pattern,3,not_applicable,0
+PC0585,Male,borderline glycemic markers,30,1,17,4,0,1,45,0,none,1,none,1,not_applicable,0
+PC0586,Female,borderline glycemic markers,29,1,15,5,0,1,38,0,none,0,none,1,not_applicable,0
+PC0587,Female,borderline glycemic markers,31,1,19,4,0,1,56,0,partial,2,partial,2,none,2
+PC0588,Female,borderline glycemic markers,30,1,15,3,0,1,48,0,none,0,none,0,partial,1
+PC0589,Male,borderline glycemic markers,25,1,12,5,0,0,37,0,partial,2,none,1,not_applicable,0
+PC0590,Female,borderline glycemic markers,29,2,12,6,0,0,61,0,partial,2,pattern,3,none,3
+PC0591,Female,borderline glycemic markers,31,1,15,5,0,1,44,0,none,0,none,1,not_applicable,0
+PC0592,Male,borderline glycemic markers,37,3,19,7,0,1,46,0,none,1,partial,2,not_applicable,0
+PC0593,Female,borderline glycemic markers,23,3,11,2,0,1,35,0,none,0,none,1,not_applicable,0
+PC0594,Female,borderline glycemic markers,28,1,16,4,0,0,39,0,none,0,none,1,not_applicable,0
+PC0595,Female,borderline glycemic markers,39,0,20,7,0,0,63,0,none,1,none,1,partial,2
+PC0596,Female,borderline glycemic markers,20,1,8,4,0,0,35,0,pattern,3,partial,2,not_applicable,0
+PC0597,Female,borderline glycemic markers,25,2,13,5,0,0,49,0,partial,2,none,1,none,2
+PC0598,Female,borderline glycemic markers,30,2,16,4,0,2,51,0,none,1,none,1,none,2
+PC0599,Female,borderline glycemic markers,29,2,12,5,0,0,35,0,pattern,3,partial,2,not_applicable,0
+PC0600,Male,borderline glycemic markers,32,2,16,5,0,1,43,0,none,0,pattern,3,not_applicable,0
+PC0601,Male,hypertension | hyperlipidemia | prediabetes,42,1,15,7,0,2,47,0,pattern,3,partial,2,not_applicable,0
+PC0602,Male,,24,1,11,5,0,1,41,0,pattern,3,pattern,3,not_applicable,0
+PC0603,Female,pcos,31,1,13,4,0,1,55,0,partial,2,partial,2,pattern,3
+PC0604,Female,gerd | hypothyroidism | vitamin d insufficiency,29,2,10,6,0,1,54,0,partial,2,partial,2,none,2
+PC0605,Female,prediabetes | migraine | hypothyroidism | iron deficiency,40,1,12,8,0,1,69,0,pattern,3,none,1,none,2
+PC0606,Female,migraine,33,2,16,4,0,0,55,0,partial,2,pattern,3,not_applicable,0
+PC0607,Male,hypertension,29,2,9,7,0,0,45,0,partial,2,partial,2,not_applicable,0
+PC0608,Female,,26,1,11,7,0,1,51,0,none,0,partial,2,none,1
+PC0609,Female,hypothyroidism | iron deficiency | migraine | gerd,43,0,18,7,0,3,54,0,none,0,pattern,3,not_applicable,0
+PC0610,Male,gerd,31,0,18,4,0,2,42,0,none,0,partial,2,not_applicable,0
+PC0611,Female,vitamin d insufficiency | iron deficiency | hypothyroidism,44,2,17,9,0,2,60,0,partial,2,none,1,none,3
+PC0612,Male,,32,0,15,6,0,1,54,0,none,1,none,1,not_applicable,0
+PC0613,Female,hypothyroidism | pcos | iron deficiency | vitamin d insufficiency,34,0,8,7,0,1,47,0,none,0,none,1,partial,1
+PC0614,Male,,30,1,18,5,0,2,42,0,partial,2,none,1,not_applicable,0
+PC0615,Male,,25,2,13,3,0,0,36,0,none,0,none,1,not_applicable,0
+PC0616,Male,prediabetes,29,0,12,5,0,2,47,0,partial,2,partial,2,not_applicable,0
+PC0617,Male,prediabetes | hyperlipidemia,36,0,12,6,0,1,47,0,pattern,3,partial,2,not_applicable,0
+PC0618,Male,prediabetes | hypertension,33,1,10,7,0,0,39,0,partial,2,partial,2,not_applicable,0
+PC0619,Male,asthma,20,0,10,2,0,0,44,0,none,1,none,1,not_applicable,0
+PC0620,Female,hyperlipidemia | migraine | hypertension,36,2,10,8,0,0,49,0,partial,2,partial,2,not_applicable,0
+PC0621,Male,,26,0,10,6,0,2,44,0,none,0,partial,2,not_applicable,0
+PC0622,Male,,36,2,20,6,0,0,51,0,none,1,partial,2,not_applicable,0
+PC0623,Female,asthma | hypertension | gerd | hypothyroidism,40,4,13,7,0,1,49,0,none,1,partial,2,not_applicable,0
+PC0624,Female,hypertension,41,2,20,5,0,3,57,0,none,0,none,1,not_applicable,0
+PC0625,Male,,29,1,14,4,0,2,48,0,none,1,partial,2,not_applicable,0
+PC0626,Female,hypothyroidism | hyperlipidemia,46,3,20,8,0,1,53,0,none,0,partial,2,not_applicable,0
+PC0627,Male,hypertension,36,2,17,3,0,2,48,0,none,1,none,1,not_applicable,0
+PC0628,Male,,26,0,13,8,0,1,36,0,none,1,none,1,not_applicable,0
+PC0629,Female,hypertension | vitamin d insufficiency,34,1,14,6,0,0,40,0,partial,2,partial,2,not_applicable,0
+PC0630,Male,type 2 diabetes,29,0,8,7,0,0,51,0,partial,2,pattern,3,not_applicable,0
+PC0631,Female,vitamin d insufficiency | migraine | iron deficiency,38,3,16,5,0,2,61,0,none,1,none,1,none,1
+PC0632,Male,gerd,30,1,17,5,0,0,48,0,none,1,partial,2,not_applicable,0
+PC0633,Male,migraine | hypertension | gerd,39,2,18,4,0,2,49,0,none,1,none,1,not_applicable,0
+PC0634,Female,vitamin d insufficiency,36,1,15,6,0,2,69,0,none,1,pattern,3,none,2
+PC0635,Male,asthma,38,1,21,6,0,1,59,0,none,0,pattern,3,not_applicable,0
+PC0636,Female,prediabetes | hypothyroidism,40,4,16,7,0,0,67,0,pattern,4,none,1,none,2
+PC0637,Female,prediabetes | hypertension | hypothyroidism | vitamin d insufficiency,45,2,14,7,0,1,48,0,pattern,3,partial,2,not_applicable,0
+PC0638,Male,hypertension | asthma | prediabetes,41,0,17,5,0,2,56,0,pattern,3,pattern,3,not_applicable,0
+PC0639,Female,hypertension | migraine,35,1,15,5,0,2,62,0,none,1,pattern,3,none,2
+PC0640,Female,iron deficiency,27,2,9,5,0,0,62,0,partial,2,none,1,none,2
+PC0641,Male,hypertension,35,2,15,4,0,1,55,0,none,1,pattern,3,not_applicable,0
+PC0642,Female,iron deficiency | hypertension,38,2,13,5,0,1,55,0,none,1,partial,2,not_applicable,0
+PC0643,Male,,25,1,16,5,0,0,40,0,none,0,none,1,not_applicable,0
+PC0644,Female,hypertension | hypothyroidism | type 2 diabetes,33,1,14,2,0,0,41,0,partial,2,none,1,not_applicable,0
+PC0645,Male,hypertension,41,4,20,5,0,1,56,0,partial,2,partial,2,not_applicable,0
+PC0646,Female,hypothyroidism,24,2,9,5,0,0,56,0,partial,2,none,1,none,2
+PC0647,Male,,33,1,18,7,0,2,43,0,none,1,partial,2,not_applicable,0
+PC0648,Male,,30,2,15,5,0,0,43,0,none,1,none,1,not_applicable,0
+PC0649,Female,iron deficiency | gerd | hyperlipidemia | hypothyroidism,32,1,12,4,0,0,70,0,none,1,pattern,3,none,2
+PC0650,Female,vitamin d insufficiency | hypothyroidism,37,7,8,7,0,0,63,0,pattern,3,pattern,3,none,3
+PC0651,Male,hypertension | hyperlipidemia,27,1,8,4,0,0,41,0,partial,2,pattern,3,not_applicable,0
+PC0652,Female,vitamin d insufficiency,41,3,20,5,0,3,69,0,none,0,partial,2,none,1
+PC0653,Female,vitamin d insufficiency | iron deficiency,36,1,15,7,0,1,59,0,none,0,none,0,none,1
+PC0654,Male,hyperlipidemia | hypertension,26,1,8,6,0,0,35,0,none,0,partial,2,not_applicable,0
+PC0655,Female,hypothyroidism | vitamin d insufficiency | hypertension | prediabetes,53,3,22,8,0,2,58,0,partial,2,partial,2,not_applicable,0
+PC0656,Male,prediabetes | gerd | hypertension | hyperlipidemia,45,2,14,5,0,1,61,0,pattern,3,pattern,4,not_applicable,0
+PC0657,Female,hyperlipidemia | vitamin d insufficiency | asthma | migraine,43,2,15,8,0,0,58,0,pattern,3,partial,2,not_applicable,0
+PC0658,Male,prediabetes,29,1,10,5,0,0,52,0,pattern,3,pattern,3,not_applicable,0
+PC0659,Male,hyperlipidemia | prediabetes,36,1,11,8,0,1,45,0,partial,2,partial,2,not_applicable,0
+PC0660,Female,iron deficiency,26,1,11,7,0,0,56,0,partial,2,none,0,none,3
+PC0661,Male,hypertension | migraine | asthma,43,2,17,7,0,3,58,0,none,1,pattern,3,not_applicable,0
+PC0662,Female,migraine | hypothyroidism | asthma,39,1,14,10,0,2,61,0,none,0,none,1,none,0
+PC0663,Female,hypertension,29,1,12,5,0,1,45,0,none,0,pattern,4,not_applicable,0
+PC0664,Male,,35,1,20,3,0,3,50,0,none,1,pattern,3,not_applicable,0
+PC0665,Male,gerd,27,0,13,6,0,0,41,0,partial,2,pattern,3,not_applicable,0
+PC0666,Female,asthma | hypertension | iron deficiency,30,1,9,6,0,0,43,0,pattern,3,partial,2,not_applicable,0
+PC0667,Female,vitamin d insufficiency | iron deficiency,39,2,15,7,0,0,53,0,partial,2,partial,2,not_applicable,0
+PC0668,Male,hyperlipidemia,37,2,18,6,0,0,48,0,partial,2,pattern,3,not_applicable,0
+PC0669,Female,migraine | hyperlipidemia,32,0,9,7,0,1,44,0,pattern,3,partial,2,not_applicable,0
+PC0670,Male,gerd,29,0,17,4,0,0,48,0,none,0,partial,2,not_applicable,0
+PC0671,Female,iron deficiency,45,4,21,7,0,1,76,0,partial,2,partial,2,none,2
+PC0672,Female,hypothyroidism | asthma | iron deficiency,30,2,10,7,0,1,53,0,none,1,none,1,none,1
+PC0673,Female,vitamin d insufficiency | migraine | hypothyroidism,36,5,11,5,0,0,62,0,partial,2,partial,2,none,3
+PC0674,Female,iron deficiency | vitamin d insufficiency | gerd,41,1,15,7,0,1,69,0,none,1,partial,2,none,1
+PC0675,Female,,30,1,14,5,0,1,66,0,pattern,3,partial,2,none,3
+PC0676,Female,vitamin d insufficiency | migraine,30,0,12,8,0,1,53,0,partial,2,none,1,none,3
+PC0677,Female,hypothyroidism | hypertension | type 2 diabetes | iron deficiency,44,0,14,7,0,0,59,0,pattern,3,none,1,not_applicable,0
+PC0678,Male,,36,1,18,6,0,3,56,0,none,0,none,1,not_applicable,0
+PC0679,Male,hypertension | asthma,39,2,17,4,0,2,55,0,pattern,3,partial,2,not_applicable,0
+PC0680,Female,prediabetes | vitamin d insufficiency | gerd,44,2,16,8,0,3,53,0,partial,2,partial,2,not_applicable,0
+PC0681,Female,gerd | iron deficiency | hypothyroidism | prediabetes,47,4,15,10,0,0,69,0,pattern,3,partial,2,none,3
+PC0682,Female,hyperlipidemia | iron deficiency,37,3,17,4,0,1,51,0,partial,2,partial,2,not_applicable,0
+PC0683,Female,iron deficiency | hypothyroidism,29,4,9,6,0,0,36,0,partial,2,none,1,not_applicable,0
+PC0684,Female,migraine | vitamin d insufficiency,33,2,15,4,0,2,69,0,none,0,none,1,none,1
+PC0685,Male,hyperlipidemia | migraine,39,2,16,7,0,1,58,0,partial,2,partial,2,not_applicable,0
+PC0686,Male,hyperlipidemia | hypertension | gerd,28,3,3,7,0,0,38,0,none,1,partial,2,not_applicable,0
+PC0687,Female,hypothyroidism | hyperlipidemia,42,2,20,6,0,2,57,0,none,0,none,1,not_applicable,0
+PC0688,Male,,33,2,16,8,0,2,43,0,none,0,none,1,not_applicable,0
+PC0689,Male,prediabetes,40,3,16,8,0,1,53,0,pattern,3,none,1,not_applicable,0
+PC0690,Male,migraine,30,0,13,6,0,1,55,0,partial,2,partial,2,not_applicable,0
+PC0691,Male,,28,1,17,5,0,0,46,0,none,1,none,1,not_applicable,0
+PC0692,Female,hypothyroidism | iron deficiency | migraine | vitamin d insufficiency,40,4,14,7,0,0,57,0,none,0,none,1,none,1
+PC0693,Female,asthma | iron deficiency,34,3,13,6,0,0,61,0,none,1,none,1,none,2
+PC0694,Male,hypertension | type 2 diabetes,33,1,12,5,0,1,38,0,partial,2,partial,2,not_applicable,0
+PC0695,Female,type 2 diabetes | iron deficiency | vitamin d insufficiency | hypertension,38,0,12,6,0,1,44,0,partial,2,none,1,not_applicable,0
+PC0696,Female,migraine | asthma,34,3,11,6,0,1,64,0,none,1,pattern,4,none,1
+PC0697,Female,iron deficiency | type 2 diabetes | hyperlipidemia,36,0,14,7,0,0,58,0,partial,2,partial,2,not_applicable,0
+PC0698,Female,hypothyroidism | vitamin d insufficiency | iron deficiency | hyperlipidemia,39,4,8,9,0,0,51,0,none,0,partial,2,not_applicable,0
+PC0699,Female,hyperlipidemia | gerd | hypertension | iron deficiency,41,1,14,5,0,1,51,0,none,0,partial,2,not_applicable,0
+PC0700,Female,,28,2,15,7,0,0,40,0,partial,2,none,1,not_applicable,0
+PC0701,Male,hypertension | hyperlipidemia | prediabetes,42,2,15,7,0,1,47,0,pattern,3,partial,2,not_applicable,0
+PC0702,Male,,19,1,7,5,0,0,37,0,partial,2,pattern,3,not_applicable,0
+PC0703,Female,pcos,32,2,13,4,0,1,55,0,partial,2,partial,2,pattern,3
+PC0704,Female,gerd | hypothyroidism | vitamin d insufficiency,35,3,15,6,0,1,59,0,partial,2,partial,2,none,2
+PC0705,Female,prediabetes | migraine | hypothyroidism | iron deficiency,37,1,10,6,0,2,67,0,partial,2,none,1,none,2
+PC0706,Female,migraine,37,2,20,4,0,0,59,0,partial,2,pattern,3,not_applicable,0
+PC0707,Male,hypertension,28,1,10,6,0,0,46,0,pattern,3,partial,2,not_applicable,0
+PC0708,Female,,24,1,11,7,0,0,51,0,none,0,none,1,none,1
+PC0709,Female,hypothyroidism | iron deficiency | migraine | gerd,44,0,18,7,0,4,54,0,none,1,pattern,3,not_applicable,0
+PC0710,Male,gerd,27,0,15,4,0,1,39,0,none,1,partial,2,not_applicable,0
+PC0711,Female,vitamin d insufficiency | iron deficiency | hypothyroidism,40,2,15,9,0,0,58,0,partial,2,none,1,none,3
+PC0712,Male,,28,0,12,6,0,0,51,0,partial,2,none,1,not_applicable,0
+PC0713,Female,hypothyroidism | pcos | iron deficiency | vitamin d insufficiency,41,0,15,7,0,1,54,0,none,0,none,1,partial,1
+PC0714,Male,,28,2,15,5,0,1,39,0,partial,2,partial,2,not_applicable,0
+PC0715,Male,,25,2,13,3,0,0,36,0,none,0,partial,2,not_applicable,0
+PC0716,Male,prediabetes,26,0,10,5,0,0,45,0,partial,2,pattern,3,not_applicable,0
+PC0717,Male,prediabetes | hyperlipidemia,41,0,15,8,0,1,50,0,pattern,3,partial,2,not_applicable,0
+PC0718,Male,prediabetes | hypertension,38,1,16,6,0,0,45,0,partial,2,pattern,3,not_applicable,0
+PC0719,Male,asthma,18,0,8,2,0,0,42,0,none,1,none,1,not_applicable,0
+PC0720,Female,hyperlipidemia | migraine | hypertension,33,0,12,5,0,0,51,0,none,1,partial,2,not_applicable,0
+PC0721,Male,,30,0,14,7,0,1,48,0,none,0,partial,2,not_applicable,0
+PC0722,Male,,32,1,16,6,0,0,47,0,none,1,pattern,3,not_applicable,0
+PC0723,Female,asthma | hypertension | gerd | hypothyroidism,44,5,16,7,0,1,52,0,none,1,partial,2,not_applicable,0
+PC0724,Female,hypertension,38,3,16,7,1,0,53,0,none,1,none,1,not_applicable,0
+PC0725,Male,,30,2,14,4,0,2,48,0,none,1,partial,2,not_applicable,0
+PC0726,Female,hypothyroidism | hyperlipidemia,48,3,22,9,0,0,55,0,none,0,partial,2,not_applicable,0
+PC0727,Male,hypertension,33,1,17,3,0,0,48,0,none,0,none,1,not_applicable,0
+PC0728,Male,,24,1,11,7,0,1,34,0,none,1,none,0,not_applicable,0
+PC0729,Female,hypertension | vitamin d insufficiency,33,1,13,6,0,0,39,0,partial,2,partial,2,not_applicable,0
+PC0730,Male,type 2 diabetes,35,0,13,7,0,1,56,0,partial,2,pattern,3,not_applicable,0
+PC0731,Female,vitamin d insufficiency | migraine | iron deficiency,38,3,16,6,0,1,61,0,none,1,none,1,none,1
+PC0732,Male,gerd,27,1,14,5,0,0,45,0,partial,2,partial,2,not_applicable,0
+PC0733,Male,migraine | hypertension | gerd,40,2,19,4,0,2,50,0,none,1,partial,2,not_applicable,0
+PC0734,Female,vitamin d insufficiency,36,1,16,6,0,2,70,0,partial,2,partial,2,none,3
+PC0735,Male,asthma,35,1,19,5,0,1,57,0,none,0,pattern,3,not_applicable,0
+PC0736,Female,prediabetes | hypothyroidism,42,3,20,6,0,0,71,0,pattern,4,none,1,none,2
+PC0737,Female,prediabetes | hypertension | hypothyroidism | vitamin d insufficiency,41,0,13,7,0,0,47,0,pattern,3,partial,2,not_applicable,0
+PC0738,Male,hypertension | asthma | prediabetes,40,0,17,4,0,2,56,0,pattern,3,partial,2,not_applicable,0
+PC0739,Female,hypertension | migraine,35,2,14,6,0,1,61,0,none,1,pattern,3,none,2
+PC0740,Female,iron deficiency,21,0,4,5,0,1,57,0,partial,2,none,1,none,2
+PC0741,Male,hypertension,36,1,14,5,0,3,54,0,none,1,pattern,3,not_applicable,0
+PC0742,Female,iron deficiency | hypertension,33,2,9,4,0,1,51,0,none,1,partial,2,not_applicable,0
+PC0743,Male,,28,2,17,4,0,1,41,0,none,1,partial,2,not_applicable,0
+PC0744,Female,hypertension | hypothyroidism | type 2 diabetes,45,2,21,2,0,4,48,0,partial,2,partial,2,not_applicable,0
+PC0745,Male,hypertension,37,4,17,4,0,1,53,0,partial,2,partial,2,not_applicable,0
+PC0746,Female,hypothyroidism,32,3,13,7,0,1,60,0,partial,2,none,1,none,2
+PC0747,Male,,27,1,14,6,0,1,39,0,none,0,partial,2,not_applicable,0
+PC0748,Male,,27,1,12,6,0,0,40,0,none,1,none,1,not_applicable,0
+PC0749,Female,iron deficiency | gerd | hyperlipidemia | hypothyroidism,32,2,10,4,0,1,68,0,none,1,pattern,3,none,2
+PC0750,Female,vitamin d insufficiency | hypothyroidism,39,6,10,8,0,0,65,0,pattern,3,pattern,3,none,3
+PC0751,Male,hypertension | hyperlipidemia,29,1,10,4,0,0,43,0,partial,2,pattern,3,not_applicable,0
+PC0752,Female,vitamin d insufficiency,36,6,15,5,0,0,64,0,none,0,partial,2,none,1
+PC0753,Female,vitamin d insufficiency | iron deficiency,38,2,16,7,0,1,60,0,partial,2,none,1,none,3
+PC0754,Male,hyperlipidemia | hypertension,36,0,17,6,0,2,44,0,none,0,partial,2,not_applicable,0
+PC0755,Female,hypothyroidism | vitamin d insufficiency | hypertension | prediabetes,48,2,19,8,0,1,55,0,pattern,3,partial,2,not_applicable,0
+PC0756,Male,prediabetes | gerd | hypertension | hyperlipidemia,45,3,13,5,0,1,60,0,pattern,3,pattern,4,not_applicable,0
+PC0757,Female,hyperlipidemia | vitamin d insufficiency | asthma | migraine,41,3,14,7,0,0,57,0,pattern,3,none,1,not_applicable,0
+PC0758,Male,prediabetes,30,2,11,5,0,0,53,0,pattern,3,partial,2,not_applicable,0
+PC0759,Male,hyperlipidemia | prediabetes,37,0,14,8,0,0,48,0,partial,2,partial,2,not_applicable,0
+PC0760,Female,iron deficiency,22,1,8,6,0,0,53,0,pattern,3,none,0,none,3
+PC0761,Male,hypertension | migraine | asthma,36,2,10,7,0,3,51,0,none,1,pattern,3,not_applicable,0
+PC0762,Female,migraine | hypothyroidism | asthma,38,2,15,9,0,0,62,0,none,0,none,1,none,0
+PC0763,Female,hypertension,26,0,11,4,0,1,44,0,none,1,pattern,3,not_applicable,0
+PC0764,Male,,31,1,16,4,0,2,46,0,none,0,pattern,3,not_applicable,0
+PC0765,Male,gerd,25,0,11,6,0,0,39,0,partial,2,partial,2,not_applicable,0
+PC0766,Female,asthma | hypertension | iron deficiency,24,0,4,6,0,0,38,0,pattern,3,partial,2,not_applicable,0
+PC0767,Female,vitamin d insufficiency | iron deficiency,39,2,13,9,0,0,51,0,partial,2,partial,2,not_applicable,0
+PC0768,Male,hyperlipidemia,36,1,16,6,0,1,46,0,partial,2,pattern,3,not_applicable,0
+PC0769,Female,migraine | hyperlipidemia,39,0,15,7,0,2,50,0,pattern,3,partial,2,not_applicable,0
+PC0770,Male,gerd,34,1,15,6,0,3,46,0,none,0,pattern,3,not_applicable,0
+PC0771,Female,iron deficiency,38,4,16,6,0,0,71,0,partial,2,partial,2,none,2
+PC0772,Female,hypothyroidism | asthma | iron deficiency,34,1,14,8,0,1,57,0,partial,2,none,1,none,1
+PC0773,Female,vitamin d insufficiency | migraine | hypothyroidism,34,4,9,6,0,0,60,0,partial,2,partial,2,none,3
+PC0774,Female,iron deficiency | vitamin d insufficiency | gerd,46,1,19,7,0,2,73,0,partial,2,partial,2,none,1
+PC0775,Female,,31,1,14,5,0,2,66,0,pattern,3,partial,2,none,3
+PC0776,Female,vitamin d insufficiency | migraine,33,1,14,7,0,2,55,0,none,1,none,1,none,2
+PC0777,Female,hypothyroidism | hypertension | type 2 diabetes | iron deficiency,42,0,11,7,0,1,56,0,pattern,3,none,1,not_applicable,0
+PC0778,Male,,34,1,17,6,0,2,55,0,none,0,none,1,not_applicable,0
+PC0779,Male,hypertension | asthma,33,2,12,3,0,2,50,0,pattern,3,none,1,not_applicable,0
+PC0780,Female,prediabetes | vitamin d insufficiency | gerd,38,0,15,6,0,2,52,0,partial,2,partial,2,not_applicable,0
+PC0781,Female,gerd | iron deficiency | hypothyroidism | prediabetes,48,2,19,9,0,0,73,0,pattern,3,partial,2,none,3
+PC0782,Female,hyperlipidemia | iron deficiency,30,2,12,4,0,0,46,0,pattern,4,partial,2,not_applicable,0
+PC0783,Female,iron deficiency | hypothyroidism,34,3,15,6,0,0,42,0,none,1,none,1,not_applicable,0
+PC0784,Female,migraine | vitamin d insufficiency,36,3,16,6,0,1,70,0,partial,2,none,1,none,2
+PC0785,Male,hyperlipidemia | migraine,32,2,12,5,0,0,54,0,none,1,partial,2,not_applicable,0
+PC0786,Male,hyperlipidemia | hypertension | gerd,33,2,9,7,0,0,44,0,none,1,partial,2,not_applicable,0
+PC0787,Female,hypothyroidism | hyperlipidemia,40,2,20,4,0,1,57,0,none,0,partial,2,not_applicable,0
+PC0788,Male,,29,1,12,8,0,3,39,0,none,0,none,1,not_applicable,0
+PC0789,Male,prediabetes,35,2,12,8,0,0,49,0,pattern,3,partial,2,not_applicable,0
+PC0790,Male,migraine,33,0,15,6,0,1,57,0,partial,2,pattern,3,not_applicable,0
+PC0791,Male,,26,1,13,6,0,1,42,0,none,1,none,1,not_applicable,0
+PC0792,Female,hypothyroidism | iron deficiency | migraine | vitamin d insufficiency,36,3,10,6,0,2,53,0,none,0,none,1,none,1
+PC0793,Female,asthma | iron deficiency,35,2,14,6,0,1,62,0,partial,2,none,1,none,3
+PC0794,Male,hypertension | type 2 diabetes,33,1,13,5,0,0,39,0,partial,2,partial,2,not_applicable,0
+PC0795,Female,type 2 diabetes | iron deficiency | vitamin d insufficiency | hypertension,40,0,16,5,0,0,48,0,partial,2,none,1,not_applicable,0
+PC0796,Female,migraine | asthma,36,3,12,6,0,2,65,0,none,1,pattern,4,none,1
+PC0797,Female,iron deficiency | type 2 diabetes | hyperlipidemia,34,0,13,6,0,0,57,0,partial,2,partial,2,not_applicable,0
+PC0798,Female,hypothyroidism | vitamin d insufficiency | iron deficiency | hyperlipidemia,53,4,20,10,0,1,63,0,none,0,partial,2,not_applicable,0
+PC0799,Female,hyperlipidemia | gerd | hypertension | iron deficiency,44,1,15,7,0,1,52,0,none,0,partial,2,not_applicable,0
+PC0800,Female,,30,2,16,7,0,0,41,0,partial,2,partial,2,not_applicable,0
+PC0801,Male,hypertension | hyperlipidemia | prediabetes,42,0,16,8,0,1,48,0,pattern,3,partial,2,not_applicable,0
+PC0802,Male,,24,1,11,5,0,1,41,0,pattern,3,pattern,3,not_applicable,0
+PC0803,Female,pcos,33,3,13,4,0,1,55,0,partial,2,partial,2,pattern,3
+PC0804,Female,gerd | hypothyroidism | vitamin d insufficiency,31,3,10,7,0,1,54,0,partial,2,partial,2,none,2
+PC0805,Female,prediabetes | migraine | hypothyroidism | iron deficiency,40,1,11,8,0,2,68,0,pattern,3,none,1,none,2
+PC0806,Female,migraine,32,3,14,4,0,0,53,0,partial,2,pattern,3,not_applicable,0
+PC0807,Male,hypertension,29,1,11,7,0,0,47,0,partial,2,none,1,not_applicable,0
+PC0808,Female,,28,1,15,7,0,0,55,0,none,0,none,1,none,1
+PC0809,Female,hypothyroidism | iron deficiency | migraine | gerd,41,0,17,7,0,2,53,0,none,1,pattern,3,not_applicable,0
+PC0810,Male,gerd,30,0,17,5,0,1,41,0,none,0,partial,2,not_applicable,0
+PC0811,Female,vitamin d insufficiency | iron deficiency | hypothyroidism,43,3,16,8,0,2,59,0,partial,2,none,1,none,3
+PC0812,Male,,27,0,10,7,0,0,49,0,partial,2,none,1,not_applicable,0
+PC0813,Female,hypothyroidism | pcos | iron deficiency | vitamin d insufficiency,39,1,11,8,0,0,50,0,none,1,partial,2,partial,2
+PC0814,Male,,27,1,13,7,0,1,37,0,none,0,partial,2,not_applicable,0
+PC0815,Male,,27,2,15,3,0,0,38,0,none,0,partial,2,not_applicable,0
+PC0816,Male,prediabetes,34,0,17,5,0,2,52,0,partial,2,partial,2,not_applicable,0
+PC0817,Male,prediabetes | hyperlipidemia,42,0,17,6,0,2,52,0,pattern,3,partial,2,not_applicable,0
+PC0818,Male,prediabetes | hypertension,32,1,9,6,0,1,38,0,partial,2,partial,2,not_applicable,0
+PC0819,Male,asthma,21,1,9,3,0,0,43,0,partial,2,none,1,not_applicable,0
+PC0820,Female,hyperlipidemia | migraine | hypertension,35,1,11,7,0,0,50,0,partial,2,partial,2,not_applicable,0
+PC0821,Male,,29,0,13,7,0,1,47,0,none,0,none,1,not_applicable,0
+PC0822,Male,,28,2,11,7,0,0,42,0,none,1,partial,2,not_applicable,0
+PC0823,Female,asthma | hypertension | gerd | hypothyroidism,42,4,16,7,0,0,52,0,none,1,partial,2,not_applicable,0
+PC0824,Female,hypertension,31,2,12,4,0,2,49,0,none,1,none,1,not_applicable,0
+PC0825,Male,,27,0,14,4,0,1,48,0,none,1,partial,2,not_applicable,0
+PC0826,Female,hypothyroidism | hyperlipidemia,45,2,21,7,0,1,54,0,none,0,pattern,3,not_applicable,0
+PC0827,Male,hypertension,34,1,15,4,0,2,46,0,none,1,partial,2,not_applicable,0
+PC0828,Male,,29,1,14,8,0,2,37,0,partial,2,none,1,not_applicable,0
+PC0829,Female,hypertension | vitamin d insufficiency,32,0,14,5,0,0,40,0,partial,2,partial,2,not_applicable,0
+PC0830,Male,type 2 diabetes,32,0,10,8,0,0,53,0,partial,2,pattern,3,not_applicable,0
+PC0831,Female,vitamin d insufficiency | migraine | iron deficiency,34,3,13,5,0,1,58,0,none,1,partial,2,none,1
+PC0832,Male,gerd,29,1,14,6,0,1,45,0,none,0,partial,2,not_applicable,0
+PC0833,Male,migraine | hypertension | gerd,44,3,18,5,0,5,49,0,none,1,partial,2,not_applicable,0
+PC0834,Female,vitamin d insufficiency,39,2,16,6,0,3,70,0,partial,2,pattern,3,none,3
+PC0835,Male,asthma,34,3,17,5,0,0,55,0,partial,2,pattern,3,not_applicable,0
+PC0836,Female,prediabetes | hypothyroidism,35,3,12,7,0,0,63,0,pattern,4,none,1,none,2
+PC0837,Female,prediabetes | hypertension | hypothyroidism | vitamin d insufficiency,48,2,16,8,0,1,50,0,pattern,3,partial,2,not_applicable,0
+PC0838,Male,hypertension | asthma | prediabetes,43,0,20,4,0,2,59,0,pattern,3,partial,2,not_applicable,0
+PC0839,Female,hypertension | migraine,36,2,15,6,0,1,62,0,partial,2,pattern,3,none,3
+PC0840,Female,iron deficiency,28,1,11,5,0,0,64,0,none,1,none,1,none,2
+PC0841,Male,hypertension,38,2,18,4,0,1,58,0,none,1,pattern,3,not_applicable,0
+PC0842,Female,iron deficiency | hypertension,32,2,8,5,0,0,50,0,partial,2,partial,2,not_applicable,0
+PC0843,Male,,21,2,12,3,0,1,36,0,none,0,none,1,not_applicable,0
+PC0844,Female,hypertension | hypothyroidism | type 2 diabetes,38,0,20,2,0,0,47,0,partial,2,none,1,not_applicable,0
+PC0845,Male,hypertension,33,4,14,4,0,0,50,0,partial,2,partial,2,not_applicable,0
+PC0846,Female,hypothyroidism,26,2,10,6,0,0,57,0,partial,2,none,1,none,2
+PC0847,Male,,25,1,13,6,0,1,38,0,none,0,none,1,not_applicable,0
+PC0848,Male,,26,1,12,5,0,0,40,0,none,1,none,1,not_applicable,0
+PC0849,Female,iron deficiency | gerd | hyperlipidemia | hypothyroidism,35,2,13,5,0,0,71,0,none,1,pattern,3,none,2
+PC0850,Female,vitamin d insufficiency | hypothyroidism,38,5,10,8,0,0,65,0,pattern,3,pattern,3,none,3
+PC0851,Male,hypertension | hyperlipidemia,33,2,12,4,0,1,45,0,partial,2,pattern,3,not_applicable,0
+PC0852,Female,vitamin d insufficiency,36,3,18,5,0,0,67,0,none,0,partial,2,none,1
+PC0853,Female,vitamin d insufficiency | iron deficiency,43,1,21,7,0,1,65,0,none,0,partial,2,none,1
+PC0854,Male,hyperlipidemia | hypertension,32,1,12,7,0,1,39,0,none,1,partial,2,not_applicable,0
+PC0855,Female,hypothyroidism | vitamin d insufficiency | hypertension | prediabetes,48,3,17,9,0,1,53,0,pattern,3,partial,2,not_applicable,0
+PC0856,Male,prediabetes | gerd | hypertension | hyperlipidemia,45,2,15,5,0,0,62,0,pattern,3,pattern,4,not_applicable,0
+PC0857,Female,hyperlipidemia | vitamin d insufficiency | asthma | migraine,44,4,14,7,0,2,57,0,partial,2,none,1,not_applicable,0
+PC0858,Male,prediabetes,29,1,10,5,0,0,52,0,pattern,3,pattern,3,not_applicable,0
+PC0859,Male,hyperlipidemia | prediabetes,33,1,8,8,0,1,42,0,partial,2,partial,2,not_applicable,0
+PC0860,Female,iron deficiency,28,1,14,6,0,0,59,0,pattern,3,none,0,none,3
+PC0861,Male,hypertension | migraine | asthma,41,2,15,8,0,2,56,0,none,1,pattern,3,not_applicable,0
+PC0862,Female,migraine | hypothyroidism | asthma,36,1,13,9,0,2,60,0,none,0,none,0,none,0
+PC0863,Female,hypertension,29,1,12,6,0,0,45,0,none,1,pattern,4,not_applicable,0
+PC0864,Male,,34,1,19,3,0,3,49,0,none,1,pattern,3,not_applicable,0
+PC0865,Male,gerd,29,0,15,6,0,0,43,0,partial,2,pattern,3,not_applicable,0
+PC0866,Female,asthma | hypertension | iron deficiency,30,0,9,6,0,1,43,0,pattern,3,partial,2,not_applicable,0
+PC0867,Female,vitamin d insufficiency | iron deficiency,36,1,12,7,0,1,50,0,partial,2,partial,2,not_applicable,0
+PC0868,Male,hyperlipidemia,34,1,14,6,0,1,44,0,partial,2,pattern,3,not_applicable,0
+PC0869,Female,migraine | hyperlipidemia,31,0,9,7,0,0,44,0,pattern,3,partial,2,not_applicable,0
+PC0870,Male,gerd,26,0,13,5,0,0,44,0,none,0,partial,2,not_applicable,0
+PC0871,Female,iron deficiency,38,4,16,6,0,0,71,0,partial,2,partial,2,none,2
+PC0872,Female,hypothyroidism | asthma | iron deficiency,30,2,10,7,0,1,53,0,partial,2,none,1,none,2
+PC0873,Female,vitamin d insufficiency | migraine | hypothyroidism,34,4,10,5,0,0,61,0,partial,2,partial,2,none,3
+PC0874,Female,iron deficiency | vitamin d insufficiency | gerd,42,1,15,7,0,2,69,0,none,1,partial,2,none,1
+PC0875,Female,,28,0,13,5,0,1,65,0,pattern,3,partial,2,none,3
+PC0876,Female,vitamin d insufficiency | migraine,31,0,14,8,0,0,55,0,partial,2,none,1,none,3
+PC0877,Female,hypothyroidism | hypertension | type 2 diabetes | iron deficiency,42,0,11,7,0,1,56,0,pattern,3,none,1,not_applicable,0
+PC0878,Male,,28,1,10,7,0,2,48,0,partial,2,none,1,not_applicable,0
+PC0879,Male,hypertension | asthma,33,2,14,3,0,0,52,0,pattern,3,partial,2,not_applicable,0
+PC0880,Female,prediabetes | vitamin d insufficiency | gerd,44,3,15,9,0,2,52,0,partial,2,partial,2,not_applicable,0
+PC0881,Female,gerd | iron deficiency | hypothyroidism | prediabetes,48,2,19,9,0,0,73,0,pattern,3,partial,2,none,3
+PC0882,Female,hyperlipidemia | iron deficiency,31,3,12,4,0,0,46,0,partial,2,partial,2,not_applicable,0
+PC0883,Female,iron deficiency | hypothyroidism,31,3,12,6,0,0,39,0,none,1,none,1,not_applicable,0
+PC0884,Female,migraine | vitamin d insufficiency,35,2,13,7,0,2,67,0,none,1,partial,2,none,2
+PC0885,Male,hyperlipidemia | migraine,33,1,13,6,0,0,55,0,partial,2,partial,2,not_applicable,0
+PC0886,Male,hyperlipidemia | hypertension | gerd,33,2,9,7,0,0,44,0,partial,2,partial,2,not_applicable,0
+PC0887,Female,hypothyroidism | hyperlipidemia,39,1,19,6,0,1,56,0,none,0,none,1,not_applicable,0
+PC0888,Male,,34,2,16,7,0,4,43,0,none,0,none,1,not_applicable,0
+PC0889,Male,prediabetes,36,1,14,8,0,1,51,0,pattern,3,none,0,not_applicable,0
+PC0890,Male,migraine,31,0,15,6,0,0,57,0,partial,2,partial,2,not_applicable,0
+PC0891,Male,,27,1,16,5,0,0,45,0,none,1,none,1,not_applicable,0
+PC0892,Female,hypothyroidism | iron deficiency | migraine | vitamin d insufficiency,40,3,14,7,0,0,57,0,none,0,partial,2,none,1
+PC0893,Female,asthma | iron deficiency,32,2,13,5,0,0,61,0,partial,2,none,1,none,3
+PC0894,Male,hypertension | type 2 diabetes,36,2,14,5,0,1,40,0,partial,2,partial,2,not_applicable,0
+PC0895,Female,type 2 diabetes | iron deficiency | vitamin d insufficiency | hypertension,40,0,14,5,0,2,46,0,partial,2,none,1,not_applicable,0
+PC0896,Female,migraine | asthma,36,4,14,6,0,0,67,0,none,1,pattern,3,none,1
+PC0897,Female,iron deficiency | type 2 diabetes | hyperlipidemia,37,0,14,7,0,1,58,0,partial,2,partial,2,not_applicable,0
+PC0898,Female,hypothyroidism | vitamin d insufficiency | iron deficiency | hyperlipidemia,44,3,12,11,0,0,55,0,none,1,partial,2,not_applicable,0
+PC0899,Female,hyperlipidemia | gerd | hypertension | iron deficiency,42,1,15,5,0,1,52,0,none,0,partial,2,not_applicable,0
+PC0900,Female,,32,3,17,7,0,1,42,0,none,1,none,1,not_applicable,0
+PC0901,Male,hypertension | hyperlipidemia | prediabetes,37,0,13,7,0,0,45,0,pattern,4,partial,2,not_applicable,0
+PC0902,Male,,21,1,11,3,0,0,41,0,none,1,pattern,3,not_applicable,0
+PC0903,Female,pcos,38,2,17,4,0,3,59,0,partial,2,partial,2,pattern,3
+PC0904,Female,gerd | hypothyroidism | vitamin d insufficiency,36,4,14,6,0,1,58,0,none,1,pattern,3,none,1
+PC0905,Female,prediabetes | migraine | hypothyroidism | iron deficiency,35,1,8,7,0,1,65,0,partial,2,none,1,none,2
+PC0906,Female,migraine,34,2,17,4,0,0,56,0,partial,2,pattern,3,not_applicable,0
+PC0907,Male,hypertension,30,2,10,7,0,0,46,0,pattern,4,partial,2,not_applicable,0
+PC0908,Female,,25,1,12,7,0,0,52,0,none,0,none,1,none,1
+PC0909,Female,hypothyroidism | iron deficiency | migraine | gerd,37,1,14,6,0,1,50,0,none,1,pattern,3,not_applicable,0
+PC0910,Male,gerd,30,1,16,5,0,1,40,0,none,1,partial,2,not_applicable,0
+PC0911,Female,vitamin d insufficiency | iron deficiency | hypothyroidism,42,2,16,8,0,1,59,0,partial,2,partial,2,none,3
+PC0912,Male,,30,0,12,6,0,2,51,0,partial,2,none,1,not_applicable,0
+PC0913,Female,hypothyroidism | pcos | iron deficiency | vitamin d insufficiency,37,0,11,8,0,0,50,0,none,0,none,1,partial,1
+PC0914,Male,,34,3,18,6,0,2,42,0,partial,2,partial,2,not_applicable,0
+PC0915,Male,,23,2,12,3,0,0,35,0,none,0,none,1,not_applicable,0
+PC0916,Male,prediabetes,27,0,11,5,0,0,46,0,partial,2,pattern,3,not_applicable,0
+PC0917,Male,prediabetes | hyperlipidemia,41,0,15,7,0,2,50,0,pattern,3,partial,2,not_applicable,0
+PC0918,Male,prediabetes | hypertension,42,1,18,6,0,2,47,0,partial,2,pattern,3,not_applicable,0
+PC0919,Male,asthma,19,0,9,2,0,0,43,0,none,1,none,1,not_applicable,0
+PC0920,Female,hyperlipidemia | migraine | hypertension,34,0,13,5,0,0,52,0,partial,2,partial,2,not_applicable,0
+PC0921,Male,,26,1,9,8,0,0,43,0,none,1,partial,2,not_applicable,0
+PC0922,Male,,27,1,12,6,0,0,43,0,none,1,partial,2,not_applicable,0
+PC0923,Female,asthma | hypertension | gerd | hypothyroidism,42,4,17,6,0,0,53,0,none,1,partial,2,not_applicable,0
+PC0924,Female,hypertension,39,5,16,7,0,0,53,0,none,1,none,1,not_applicable,0
+PC0925,Male,,31,3,16,4,0,0,50,0,none,1,partial,2,not_applicable,0
+PC0926,Female,hypothyroidism | hyperlipidemia,43,3,20,7,0,0,53,0,none,0,partial,2,not_applicable,0
+PC0927,Male,hypertension,33,1,14,4,0,2,45,0,none,1,none,1,not_applicable,0
+PC0928,Male,,24,0,11,7,0,2,34,0,none,1,none,0,not_applicable,0
+PC0929,Female,hypertension | vitamin d insufficiency,34,3,13,6,0,0,39,0,none,1,none,1,not_applicable,0
+PC0930,Male,type 2 diabetes,33,1,11,7,0,0,54,0,pattern,3,pattern,3,not_applicable,0
+PC0931,Female,vitamin d insufficiency | migraine | iron deficiency,40,4,17,6,0,1,62,0,none,1,partial,2,none,1
+PC0932,Male,gerd,24,1,13,3,0,0,44,0,none,1,none,1,not_applicable,0
+PC0933,Male,migraine | hypertension | gerd,40,2,20,4,0,2,51,0,none,1,none,1,not_applicable,0
+PC0934,Female,vitamin d insufficiency,38,1,16,7,0,3,70,0,partial,2,partial,2,none,3
+PC0935,Male,asthma,32,1,15,6,0,1,53,0,none,1,pattern,3,not_applicable,0
+PC0936,Female,prediabetes | hypothyroidism,38,2,16,7,0,0,67,0,pattern,4,none,1,none,2
+PC0937,Female,prediabetes | hypertension | hypothyroidism | vitamin d insufficiency,46,0,16,8,0,1,50,0,pattern,3,partial,2,not_applicable,0
+PC0938,Male,hypertension | asthma | prediabetes,45,0,20,6,0,2,59,0,pattern,3,pattern,3,not_applicable,0
+PC0939,Female,hypertension | migraine,36,1,15,5,0,3,62,0,none,1,pattern,3,none,2
+PC0940,Female,iron deficiency,27,0,8,6,0,1,61,0,partial,2,partial,2,none,2
+PC0941,Male,hypertension,38,1,17,4,0,3,57,0,none,0,pattern,3,not_applicable,0
+PC0942,Female,iron deficiency | hypertension,38,3,11,6,0,1,53,0,none,1,partial,2,not_applicable,0
+PC0943,Male,,21,2,10,4,0,1,34,0,none,1,partial,2,not_applicable,0
+PC0944,Female,hypertension | hypothyroidism | type 2 diabetes,35,2,14,2,0,1,41,0,partial,2,partial,2,not_applicable,0
+PC0945,Male,hypertension,37,5,16,5,0,0,52,0,partial,2,partial,2,not_applicable,0
+PC0946,Female,hypothyroidism,30,3,13,6,0,0,60,0,pattern,3,none,1,none,3
+PC0947,Male,,32,2,18,6,0,1,43,0,none,1,partial,2,not_applicable,0
+PC0948,Male,,30,1,15,5,0,1,43,0,none,1,none,1,not_applicable,0
+PC0949,Female,iron deficiency | gerd | hyperlipidemia | hypothyroidism,30,2,9,4,0,1,67,0,none,1,partial,2,none,2
+PC0950,Female,vitamin d insufficiency | hypothyroidism,43,9,11,8,0,0,66,0,pattern,3,pattern,3,none,3
+PC0951,Male,hypertension | hyperlipidemia,29,1,10,4,0,0,43,0,partial,2,pattern,3,not_applicable,0
+PC0952,Female,vitamin d insufficiency,35,4,14,6,0,1,63,0,none,1,partial,2,none,2
+PC0953,Female,vitamin d insufficiency | iron deficiency,39,3,17,6,0,1,61,0,partial,2,none,1,none,2
+PC0954,Male,hyperlipidemia | hypertension,32,0,15,6,0,1,42,0,none,0,none,1,not_applicable,0
+PC0955,Female,hypothyroidism | vitamin d insufficiency | hypertension | prediabetes,57,3,24,8,0,4,60,0,pattern,3,partial,2,not_applicable,0
+PC0956,Male,prediabetes | gerd | hypertension | hyperlipidemia,44,2,13,5,1,0,60,0,pattern,3,pattern,4,not_applicable,0
+PC0957,Female,hyperlipidemia | vitamin d insufficiency | asthma | migraine,42,2,14,7,0,1,57,0,partial,2,partial,2,not_applicable,0
+PC0958,Male,prediabetes,29,0,11,6,0,0,53,0,pattern,3,partial,2,not_applicable,0
+PC0959,Male,hyperlipidemia | prediabetes,37,0,14,9,0,0,48,0,partial,2,none,1,not_applicable,0
+PC0960,Female,iron deficiency,24,1,10,6,0,0,55,0,pattern,3,none,0,none,3
+PC0961,Male,hypertension | migraine | asthma,43,3,16,8,0,2,57,0,none,1,pattern,4,not_applicable,0
+PC0962,Female,migraine | hypothyroidism | asthma,36,1,14,9,0,0,61,0,none,0,none,1,none,0
+PC0963,Female,hypertension,31,0,11,8,0,2,44,0,none,1,pattern,3,not_applicable,0
+PC0964,Male,,38,2,22,3,0,3,52,0,none,1,pattern,3,not_applicable,0
+PC0965,Male,gerd,27,0,12,6,0,1,40,0,partial,2,partial,2,not_applicable,0
+PC0966,Female,asthma | hypertension | iron deficiency,28,0,9,5,0,0,43,0,pattern,3,partial,2,not_applicable,0
+PC0967,Female,vitamin d insufficiency | iron deficiency,36,1,13,7,0,0,51,0,pattern,3,partial,2,not_applicable,0
+PC0968,Male,hyperlipidemia,34,1,15,6,0,0,45,0,none,1,pattern,3,not_applicable,0
+PC0969,Female,migraine | hyperlipidemia,35,1,12,7,0,0,47,0,pattern,3,partial,2,not_applicable,0
+PC0970,Male,gerd,30,2,14,5,0,1,45,0,none,0,partial,2,not_applicable,0
+PC0971,Female,iron deficiency,43,5,19,5,0,2,74,0,partial,2,partial,2,none,2
+PC0972,Female,hypothyroidism | asthma | iron deficiency,36,2,16,8,0,0,59,0,partial,2,none,1,none,1
+PC0973,Female,vitamin d insufficiency | migraine | hypothyroidism,40,3,14,7,0,1,65,0,partial,2,partial,2,none,3
+PC0974,Female,iron deficiency | vitamin d insufficiency | gerd,48,1,19,7,0,3,73,0,partial,2,pattern,3,none,1
+PC0975,Female,,38,1,18,5,0,5,70,0,pattern,3,partial,2,none,3
+PC0976,Female,vitamin d insufficiency | migraine,35,1,16,8,0,1,57,0,none,1,none,1,none,2
+PC0977,Female,hypothyroidism | hypertension | type 2 diabetes | iron deficiency,43,1,11,8,0,0,56,0,pattern,3,none,1,not_applicable,0
+PC0978,Male,,35,1,18,6,0,2,56,0,none,0,none,1,not_applicable,0
+PC0979,Male,hypertension | asthma,39,1,18,4,0,2,56,0,partial,2,none,1,not_applicable,0
+PC0980,Female,prediabetes | vitamin d insufficiency | gerd,41,2,16,6,0,2,53,0,partial,2,partial,2,not_applicable,0
+PC0981,Female,gerd | iron deficiency | hypothyroidism | prediabetes,52,3,20,10,0,1,74,0,pattern,3,partial,2,none,3
+PC0982,Female,hyperlipidemia | iron deficiency,35,2,15,4,0,2,49,0,pattern,3,partial,2,not_applicable,0
+PC0983,Female,iron deficiency | hypothyroidism,32,2,13,6,0,1,40,0,partial,2,none,1,not_applicable,0
+PC0984,Female,migraine | vitamin d insufficiency,31,3,12,6,0,0,66,0,partial,2,none,1,none,3
+PC0985,Male,hyperlipidemia | migraine,30,2,11,4,0,0,53,0,partial,2,partial,2,not_applicable,0
+PC0986,Male,hyperlipidemia | hypertension | gerd,29,1,6,7,0,0,41,0,none,0,partial,2,not_applicable,0
+PC0987,Female,hypothyroidism | hyperlipidemia,41,1,20,6,0,1,57,0,none,0,partial,2,not_applicable,0
+PC0988,Male,,31,2,13,8,0,2,40,0,none,1,partial,2,not_applicable,0
+PC0989,Male,prediabetes,39,3,15,8,0,1,52,0,pattern,3,none,1,not_applicable,0
+PC0990,Male,migraine,34,0,18,6,0,0,60,0,none,1,partial,2,not_applicable,0
+PC0991,Male,,31,0,18,6,0,2,47,0,none,1,none,1,not_applicable,0
+PC0992,Female,hypothyroidism | iron deficiency | migraine | vitamin d insufficiency,43,4,16,6,0,2,59,0,none,0,none,1,none,1
+PC0993,Female,asthma | iron deficiency,37,2,16,6,0,1,64,0,partial,2,none,1,none,3
+PC0994,Male,hypertension | type 2 diabetes,34,0,14,5,0,1,40,0,partial,2,partial,2,not_applicable,0
+PC0995,Female,type 2 diabetes | iron deficiency | vitamin d insufficiency | hypertension,40,2,14,5,0,0,46,0,partial,2,none,1,not_applicable,0
+PC0996,Female,migraine | asthma,35,4,11,7,0,1,64,0,partial,2,pattern,3,none,2
+PC0997,Female,iron deficiency | type 2 diabetes | hyperlipidemia,39,0,18,6,0,0,62,0,partial,2,partial,2,not_applicable,0
+PC0998,Female,hypothyroidism | vitamin d insufficiency | iron deficiency | hyperlipidemia,51,2,19,10,0,2,62,0,none,0,partial,2,not_applicable,0
+PC0999,Female,hyperlipidemia | gerd | hypertension | iron deficiency,48,1,17,8,0,2,54,0,none,0,partial,2,not_applicable,0
+PC1000,Female,,29,3,13,7,0,1,38,0,none,1,partial,2,not_applicable,0
