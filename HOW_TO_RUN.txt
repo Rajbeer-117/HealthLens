@@ -1,0 +1,72 @@
+==============================================================
+ HealthLens - Deliverable 2 (AI + LLM)   |   Group 7, COMP 8967
+==============================================================
+
+WHAT YOU NEED (one time)
+  1. Python 3.11 or newer  ->  https://www.python.org/downloads/
+     (during install, TICK "Add Python to PATH")
+  2. Ollama (free local AI) ->  https://ollama.com/download
+     Just install it. No account needed.
+
+--------------------------------------------------------------
+ EASIEST WAY: double-click  run_with_llm.bat
+--------------------------------------------------------------
+  It will automatically:
+   - start Ollama
+   - download the AI model "llama3.2" (about 2 GB, first time only)
+   - create the Python environment and install packages
+   - start HealthLens and open http://127.0.0.1:5000 in your browser
+  KEEP THE BLACK WINDOW OPEN while using the app (closing it stops the app).
+
+--------------------------------------------------------------
+ OR RUN IN VS CODE
+--------------------------------------------------------------
+  1. VS Code -> File -> Open Folder -> choose this folder (the one with app.py)
+  2. Terminal -> New Terminal, then type:
+        py -m venv .venv
+        .venv\Scripts\activate
+        python -m pip install -r requirements.txt
+        ollama pull llama3.2
+        python app.py
+     (if "activate" gives a red "running scripts is disabled" error, run first:
+        Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass )
+  3. Open http://127.0.0.1:5000 in Chrome
+  Next time only:   .venv\Scripts\activate   then   python app.py
+  Stop the app:     click the terminal, press Ctrl + C
+
+--------------------------------------------------------------
+ HOW TO SEE THE AI / LLM IS WORKING
+--------------------------------------------------------------
+  1. Sign up / sign in.
+  2. Top-right GREEN badge "AI: llama3.2..."  = LLM connected.
+     (Orange "AI: Offline templates" = Ollama not running -> open the
+      Ollama app from the Start menu, wait 10 s, refresh the page.)
+  3. Dashboard -> tab "AI Health Summary":
+       pill "LLM-generated - passed guardrails" = written by the LLM.
+       First answer can take 30-60 s while the model loads.
+  4. Click "Show exactly what the AI received and returned":
+       shows the rules given to the LLM, the de-identified data sent,
+       the RAW LLM output, and the guardrail check for each attempt.
+  5. Ask HealthLens: click the example questions or type your own.
+       "Do I have diabetes?" -> safety response (AI never diagnoses).
+  6. Menu "AI Integration" page:
+       "Test LLM connection" button, AI pipeline, guardrails, system
+       prompt and the AI audit log of every call.
+
+--------------------------------------------------------------
+ GOOD DEMO PATIENTS
+--------------------------------------------------------------
+  PC0303 - female, PCOS pattern, several signals unusual on one day
+  PC0101 - male, clear trends, medication before/after comparison
+
+--------------------------------------------------------------
+ OTHER COMMANDS (in the VS Code terminal, after activate)
+--------------------------------------------------------------
+  python -m pytest -q             -> 40 automated tests
+  python validate_scenarios.py    -> runs all 900 patients (~6 min)
+                                     results: validation\validation_summary.md
+
+  Use another LLM instead of Ollama (Gemini / OpenAI / Claude):
+  copy .env.example to .env and follow the comments inside.
+
+  Synthetic data only. Not a medical device. No diagnoses.
