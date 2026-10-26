@@ -1,1 +1,298 @@
-{% extends 'base.html' %}{% block title %}Dashboard | HealthLens{% endblock %}{% block content %}<header class="site-header dashboard-header"><div class="brand small">✿ Health<span>Lens</span></div><div class="header-right"><details class="account-menu"><summary class="account-trigger" aria-label="Open account menu"><span class="account-avatar" aria-hidden="true">{{ (account.username if account else username)[0]|upper }}</span><span class="account-trigger-name">{{ account.username if account else username }}</span><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></summary><div class="account-dropdown"><div class="account-summary"><span class="account-avatar large" aria-hidden="true">{{ (account.username if account else username)[0]|upper }}</span><div class="account-info"><strong>{{ account.username if account else username }}</strong><span>{{ account.email if account else 'Email unavailable' }}</span></div></div><div class="account-divider"></div><form action="{{url_for('logout')}}" method="post"><button class="account-logout" type="submit"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></svg> Log out</button></form></div></details></div></header><main class="dashboard"><div class="dashboard-title"><div><p class="eyebrow">UNIVERSITY OF WINDSOR · GROUP 7</p><h1>Patient Health Intelligence</h1><p class="muted">{{"Uploaded workbook" if source=="uploaded" else "Synthetic longitudinal records"}} · Descriptive analysis only</p></div><form method="get" class="patient-select"><input type="hidden" name="source" value="{{source}}"><label>Choose patient<select name="patient" onchange="this.form.submit()">{% for patient in patients %}<option value="{{patient}}" {% if patient==selected %}selected{% endif %}>{{patient}}</option>{% endfor %}</select></label></form></div><section class="upload-panel"><div><p class="eyebrow">IMPORT PATIENT DATA</p><h2>Upload a patient workbook</h2><p class="muted">Select an .xlsx workbook or a .zip containing patient workbooks downloaded from Google Drive. The dashboard automatically uses the selected workbook for charts, warnings, and history.</p><p></p></div><form action="{{url_for('upload_patients')}}" method="post" enctype="multipart/form-data" class="upload-form"><input type="hidden" name="csrf" value="{{upload_csrf}}"><label for="patient_file">Choose .xlsx or .zip file</label><input id="patient_file" type="file" name="patient_file" accept=".xlsx,.zip" required><button type="submit">Upload & Analyze</button></form><div class="source-links"><a href="{{url_for('dashboard',source='demo')}}">Built-in demo patients</a><a href="{{url_for('dashboard',source='uploaded')}}">My uploaded patients</a></div><p class="note">Synthetic demonstration data only. Uploaded files are stored locally on this server and are not suitable for real patient information.</p></section>{% if error %}<div class="alert error">{{error}}</div>{% else %}<div class="stats"><div class="stat"><span>Patient ID</span><strong>{{selected}}</strong></div><div class="stat"><span>Age</span><strong>{{profile.get('Age','Not recorded')}}</strong></div><div class="stat"><span>Sex</span><strong>{{profile.get('Sex','Not recorded')}}</strong></div><div class="stat"><span>Available patients</span><strong>{{patients|length}}</strong></div></div><section class="warning-section"><div class="section-heading"><div><p class="eyebrow">HEALTH REVIEW</p><h2>Patient measurement alerts</h2></div><span class="flag-count">{{flags|length}} flagged indicator{{'s' if flags|length != 1 else ''}}</span></div><p class="muted">Based on the latest recorded value for each supported metric. These are educational flags, not diagnoses.</p>{% if flags %}<div class="warning-grid">{% for flag in flags %}<article class="warning-card"><div class="warning-top"><span class="warning-icon">!</span><strong>{{flag.metric}}</strong><span class="warning-status">{{flag.severity}}</span></div><div class="warning-reading">{{flag.value}} <small>{{flag.unit}}</small></div><p>Illustrative reference: <strong>{{flag.reference}} {{flag.unit}}</strong></p><p class="muted">Recorded {{flag.date}}</p><p>{{flag.message}}</p></article>{% endfor %}</div>{% else %}<div class="no-flags">No out-of-range latest values detected for the supported indicators. This does not establish that the patient is healthy.</div>{% endif %}<p class="note">For symptoms or urgent concerns, seek appropriate medical care regardless of dashboard flags. Do not use this prototype for emergency triage.</p></section><div class="tabs"><button class="tab active" data-tab="trends">Health Trends</button><button class="tab" data-tab="observations">Explainable Observations</button><button class="tab" data-tab="intelligence">Trend Intelligence</button><button class="tab" data-tab="history">Diagnosis History</button><button class="tab" data-tab="meds">Medication Context</button><button class="tab" data-tab="preview">Data Preview</button></div><section class="panel active" id="trends"><h2>Longitudinal Measurements</h2><p class="muted">Choose an indicator to visualize its recorded values over time.</p><select id="metricSelect"></select><div class="chart-wrap"><canvas id="healthChart"></canvas></div><h3>Health metrics at a glance</h3><p class="muted">Compare recent historical measurements across indicators.</p><div class="mini-chart-grid" id="miniCharts"></div></section><section class="panel" id="observations"><h2>Evidence-based Observations</h2>{% if observations %}{% for obs in observations %}<div class="insight">{{obs}}</div>{% endfor %}{% else %}<p>Insufficient measurements for descriptive comparison.</p>{% endif %}<p class="note">These are first-to-last comparisons, not confirmed sustained trends, diagnoses, or causal conclusions.</p></section><section class="panel" id="intelligence"><h2>Longitudinal Change Detection</h2><p class="muted">Transparent comparison of the four most recent readings with earlier observations. A change is not automatically a health risk.</p>{% if insights %}<div class="warning-grid">{% for item in insights %}<article class="warning-card"><div class="warning-top"><strong>{{item.metric}}</strong><span class="warning-status">Change observed</span></div><div class="warning-reading">{{'%+.1f'|format(item.change)}}%</div><p>Earlier average: <strong>{{item.baseline}}</strong> · Recent average: <strong>{{item.recent}}</strong></p><p>{{item.evidence}}</p><p class="muted">Last reading: {{item.date}} · {{item.count}} observations</p><p>{{item.interpretation}}</p></article>{% endfor %}</div>{% else %}<p>No changes meeting the demo's 15% comparison threshold, or insufficient historical observations. This is not a health assessment.</p>{% endif %}<p class="note">The 15% threshold is a demonstration heuristic, not a validated medical threshold. No predictions or diagnoses are generated.</p></section><section class="panel" id="history"><h2>Diagnosis & Condition History</h2><p class="muted">Historical records are displayed only when a diagnosis or condition sheet is present in the selected patient workbook.</p>{% if history %}<div class="history-timeline">{% for event in history %}<article class="history-entry"><strong>{{event.date}} · {{event.source}}</strong><p>{{event.detail}}</p></article>{% endfor %}</div>{% else %}<p class="no-flags">No structured diagnosis or condition history sheet was found for this patient. Absence of records does not mean absence of a condition.</p>{% endif %}</section><section class="panel" id="meds"><h2>Medication History</h2><div class="table-wrap"><table><thead><tr>{% for col in meds.columns %}<th>{{col}}</th>{% endfor %}</tr></thead><tbody>{% for row in meds.rows %}<tr>{% for cell in row %}<td>{{cell}}</td>{% endfor %}</tr>{% endfor %}</tbody></table></div><p class="note">Medication information is context only; effects are not inferred.</p></section><section class="panel" id="preview"><h2>Original Workbook Data</h2><label>Sheet<select id="sheetSelect"></select></label><div class="table-wrap" id="sheetTable"></div></section><p class="note">Educational proof of concept. This demo has no per-patient access authorization and must not be used with real health records.</p><script type="application/json" id="dashboardData">{{ {'charts':charts,'sheets':sheets}|tojson }}</script>{% endif %}</main>{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Dashboard | HealthLens{% endblock %}
+{% block content %}
+{% macro chips(ids) %}{% for e in ids %}<button type="button" class="ev-chip" data-ev="{{e}}">{{e}}</button>{% endfor %}{% endmacro %}
+{% include '_header.html' %}
+
+<main class="dashboard">
+  <div class="dashboard-title">
+    <div>
+      <p class="eyebrow">UNIVERSITY OF WINDSOR · GROUP 7 · DELIVERABLE 2</p>
+      <h1>Patient Health Intelligence</h1>
+      <p class="muted">{{"Uploaded workbook" if source=="uploaded" else "Synthetic longitudinal records"}} · Explainable analysis + AI explanations · Not a diagnosis</p>
+      <p class="llm-line"><span class="dot {{ 'ok' if ai.provider != 'offline' else 'warn' }}"></span><strong>LLM in use:</strong> {{ ai.display }}</p>
+    </div>
+    <form method="get" class="patient-select">
+      <input type="hidden" name="source" value="{{source}}">
+      <label>Choose patient<select name="patient" onchange="this.form.submit()">{% for patient in patients %}<option value="{{patient}}" {% if patient==selected %}selected{% endif %}>{{patient}}</option>{% endfor %}</select></label>
+    </form>
+  </div>
+
+  {% for category,message in get_flashed_messages(with_categories=true) %}<div class="alert {{category}}">{{message}}</div>{% endfor %}
+
+  <details class="upload-panel" {% if error %}open{% endif %}>
+    <summary><span class="eyebrow">IMPORT PATIENT DATA</span> <strong>Upload a patient workbook</strong> <span class="muted">(.xlsx or .zip)</span></summary>
+    <p class="muted">Select an .xlsx workbook or a .zip containing patient workbooks downloaded from Google Drive. The dashboard automatically analyses the selected workbook.</p>
+    <form action="{{url_for('upload_patients')}}" method="post" enctype="multipart/form-data" class="upload-form">
+      <input type="hidden" name="csrf" value="{{upload_csrf}}">
+      <label for="patient_file">Choose .xlsx or .zip file</label>
+      <input id="patient_file" type="file" name="patient_file" accept=".xlsx,.zip" required>
+      <button type="submit" class="btn">Upload &amp; Analyze</button>
+    </form>
+    <div class="source-links"><a href="{{url_for('dashboard',source='demo')}}">Built-in demo patients</a><a href="{{url_for('dashboard',source='uploaded')}}">My uploaded patients</a></div>
+    <p class="note">Synthetic demonstration data only. Uploaded files are stored locally on this server and are not suitable for real patient information.</p>
+  </details>
+
+  {% if error %}
+  <div class="alert error">{{error}}</div>
+  {% else %}
+  <div class="stats stats-5">
+    <div class="stat"><span>Patient ID</span><strong>{{selected}}</strong></div>
+    <div class="stat"><span>Age / Sex</span><strong>{{profile.get('Age','—')}} · {{profile.get('Sex','—')}}</strong></div>
+    <div class="stat"><span>Record window</span><strong>{{ ((a.data_quality.window.days or 0) / 30.4)|round|int }} months</strong></div>
+    <div class="stat"><span>Evidence items</span><strong>{{a.counts.evidence}}</strong></div>
+    <div class="stat"><span>Available patients</span><strong>{{patients|length}}</strong></div>
+  </div>
+
+  <section class="scenario-strip" aria-label="Scenario overview">
+    {% for s in a.scenarios %}
+    <a href="#scenarios" class="scenario-mini status-{{s.status}}" data-open-tab="scenarios">
+      <span class="scenario-mini-name">{{s.name}}</span>
+      <span class="pill status-{{s.status}}">{{s.status_text}}</span>
+      {% if s.status not in ('not_applicable','insufficient') %}<small>{{s.signal_count}} of {{s.checked}} signal groups</small>{% else %}<small>{{s.note or 'Not enough data'}}</small>{% endif %}
+    </a>
+    {% endfor %}
+  </section>
+
+  <section class="warning-section">
+    <div class="section-heading"><div><p class="eyebrow">HEALTH REVIEW</p><h2>Latest-value review flags</h2></div><span class="flag-count">{{flags|length}} flagged indicator{{'s' if flags|length != 1 else ''}}</span></div>
+    <p class="muted">Lab values are compared with the reference range printed in the patient's own workbook; vitals use illustrative adult ranges. These are educational flags, not diagnoses.</p>
+    {% if flags %}
+    <div class="warning-grid">{% for flag in flags %}
+      <article class="warning-card">
+        <div class="warning-top"><span class="warning-icon">!</span><strong>{{flag.metric}}</strong><span class="warning-status">{{flag.severity}}</span></div>
+        <div class="warning-reading">{{flag.value}} <small>{{flag.unit}}</small></div>
+        <p>Reference: <strong>{{flag.reference}} {{flag.unit}}</strong> · Recorded {{flag.date}} {% if flag.evidence %}{{ chips([flag.evidence]) }}{% endif %}</p>
+        <p>{{flag.message}}</p>
+      </article>{% endfor %}
+    </div>
+    {% else %}<div class="no-flags">No out-of-range latest values detected for the supported indicators. This does not establish that the patient is healthy.</div>{% endif %}
+    <p class="note">This prototype does not triage. For symptoms or concerns, contact a healthcare professional.</p>
+  </section>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-tab="ai">✦ AI Health Summary</button>
+    <button class="tab" data-tab="scenarios">Scenario Patterns</button>
+    <button class="tab" data-tab="timeline">Health Timeline</button>
+    <button class="tab" data-tab="trends">Trends &amp; Anomalies</button>
+    <button class="tab" data-tab="charts">Health Charts</button>
+    <button class="tab" data-tab="quality">Data Quality</button>
+    <button class="tab" data-tab="meds">Medication Context</button>
+    <button class="tab" data-tab="history">Diagnosis History</button>
+    <button class="tab" data-tab="evidence">Evidence Register</button>
+    <button class="tab" data-tab="preview">Data Preview</button>
+  </div>
+
+  <!-- ============================== AI SUMMARY -->
+  <section class="panel active" id="ai">
+    <div class="ai-head">
+      <div>
+        <p class="eyebrow">AI HEALTH SUMMARY · POWERED BY A LARGE LANGUAGE MODEL + GUARDRAILS</p>
+        <h2>What this record shows, in plain language</h2>
+        <p class="muted">The language model only receives the de-identified evidence computed by HealthLens (no patient ID, no calendar dates, no raw rows). Every point must cite evidence, and replies with diagnostic, alarming or medication-change language are rejected.</p>
+      </div>
+      <div class="ai-provider" title="{{ai.note}}"><span class="dot {{ 'ok' if ai.ready and ai.provider != 'offline' else 'warn' }}"></span><div><strong>{{ai.label}}</strong><small>{{ai.model}}</small></div></div>
+    </div>
+    {% if ai.note %}<p class="note ai-note">{{ai.note}}</p>{% endif %}
+
+    <div id="aiLoading" class="ai-loading" hidden><span class="spinner"></span> Generating explanation…</div>
+    <div id="aiError" class="alert error" hidden></div>
+    <div id="aiResult" hidden>
+      <div class="ai-meta" id="aiMeta"></div>
+      <p class="ai-overview" id="aiOverview"></p>
+      <div class="ai-points" id="aiPoints"></div>
+      <div class="ai-two">
+        <div class="ai-box"><h3>Questions you could ask a healthcare professional</h3><ul id="aiQuestions"></ul></div>
+        <div class="ai-box"><h3>Limitations</h3><p id="aiLimits"></p></div>
+      </div>
+    </div>
+    <button type="button" class="btn ghost" id="aiRegenerate">↻ Regenerate summary</button>
+
+    <details class="trace" id="aiTrace" hidden>
+      <summary>🔍 Show exactly what the AI received and returned <span class="muted small" id="traceTitle"></span></summary>
+      <div class="trace-grid">
+        <div><h4>1 · System prompt (rules given to the LLM)</h4><pre id="traceSystem"></pre></div>
+        <div><h4>2 · De-identified data sent to the LLM</h4><p class="small muted">No patient ID, no calendar dates, no raw rows: only computed evidence.</p><pre id="traceUser"></pre></div>
+      </div>
+      <h4>3 · LLM replies and guardrail checks</h4>
+      <div id="traceAttempts"></div>
+    </details>
+
+    <div class="ask">
+      <h3>Ask HealthLens</h3>
+      <p class="muted">Ask about this record. Answers use only this patient's evidence and cite it.</p>
+      <div class="suggestions">
+        <button type="button" class="suggest">How has my blood pressure changed?</button>
+        <button type="button" class="suggest">Is my sleep related to my stress?</button>
+        <button type="button" class="suggest">What changed after my medication started?</button>
+        <button type="button" class="suggest">What data is missing?</button>
+        <button type="button" class="suggest">Do I have diabetes?</button>
+      </div>
+      <div class="chat" id="chatLog" aria-live="polite"></div>
+      <form id="askForm" class="ask-form"><input id="askInput" maxlength="500" placeholder="e.g. Why did my steps go up?" autocomplete="off"><button type="submit" class="btn">Ask</button></form>
+    </div>
+
+    <details class="pipeline">
+      <summary>How the AI layer works</summary>
+      <ol>
+        <li><strong>Data preparation</strong>: all 11 workbook sheets cleaned and dated.</li>
+        <li><strong>Explainable engine</strong>: trends (Mann-Kendall + Theil-Sen), anomalies (robust z-score vs personal baseline), reference ranges, relationships (Spearman), medication timing, data quality.</li>
+        <li><strong>Evidence register</strong>: each finding becomes a numbered evidence item with method and source.</li>
+        <li><strong>De-identification</strong>: only age band, sex and evidence text with relative dates are sent to the LLM.</li>
+        <li><strong>LLM</strong>: writes the explanation as JSON citing evidence IDs.</li>
+        <li><strong>Guardrails</strong>: unknown evidence IDs, diagnosis, risk scores, alarm/emergency wording and medication advice are rejected; one corrective retry, then a safe template fallback.</li>
+        <li><strong>Audit log</strong>: each AI call is logged (no question text, no health values) in <code>logs/ai_audit.jsonl</code>.</li>
+      </ol>
+    </details>
+  </section>
+
+  <!-- ============================== SCENARIOS -->
+  <section class="panel" id="scenarios">
+    <h2>Multi-signal scenario patterns</h2>
+    <p class="muted">Each scenario checks several related signal groups. The status is a count of groups with a noteworthy finding. It is not a risk score, probability or diagnosis.</p>
+    <div class="scenario-grid">
+      {% for s in a.scenarios %}
+      <article class="scenario-card status-{{s.status}}">
+        <header><h3>{{s.name}}</h3><span class="pill status-{{s.status}}">{{s.status_text}}</span></header>
+        {% if s.status == 'not_applicable' %}<p class="muted">{{s.note}}</p>{% else %}
+        <p class="muted small">{{s.signal_count}} of {{s.checked}} signal groups with a noteworthy finding</p>
+        <ul class="checks">
+          {% for c in s.checks %}
+          <li class="check-{{c.status}}"><span class="check-icon" aria-hidden="true">{{ '●' if c.status=='signal' else '○' if c.status=='quiet' else '–' }}</span>
+            <div><strong>{{c.signal}}</strong><span>{{c.text}}</span>{% if c.evidence %}<div>{{ chips(c.evidence) }}</div>{% endif %}</div></li>
+          {% endfor %}
+        </ul>
+        {% if s.note %}<p class="note">{{s.note}}</p>{% endif %}
+        {% if s.context %}<p class="small"><strong>Recorded context</strong> (history, medication timing, adherence): {{ chips(s.context) }}</p>{% endif %}
+        {% endif %}
+      </article>
+      {% endfor %}
+    </div>
+    <p class="note">● noteworthy finding · ○ data present, nothing noteworthy · – no data. Thresholds are documented demo heuristics, not clinical cut-offs.</p>
+  </section>
+
+  <!-- ============================== TIMELINE -->
+  <section class="panel" id="timeline">
+    <h2>Unified health timeline</h2>
+    <p class="muted">Every dated event from all sheets, plus unusual readings detected by HealthLens, on one timeline.</p>
+    <div class="filter-row" id="timelineFilters">
+      <button type="button" class="filter active" data-cat="all">All ({{a.timeline|length}})</button>
+      {% for cat, label in [('history','Diagnoses'),('medication','Medications'),('symptom','Symptoms'),('encounter','Encounters'),('lab','Lab panels'),('cycle','Cycles'),('anomaly','Unusual readings')] %}
+      {% set n = a.timeline|selectattr('category','equalto',cat)|list|length %}{% if n %}<button type="button" class="filter" data-cat="{{cat}}">{{label}} ({{n}})</button>{% endif %}
+      {% endfor %}
+    </div>
+    <div class="tl">
+      {% set ns = namespace(month='') %}
+      {% for e in a.timeline %}
+        {% if e.date[:7] != ns.month %}{% set ns.month = e.date[:7] %}<div class="tl-month" data-month>{{ e.date[:7] }}</div>{% endif %}
+        <div class="tl-item cat-{{e.category}}" data-cat="{{e.category}}">
+          <span class="tl-date">{{e.date[5:]}}</span><span class="tl-tag">{{e.category}}</span>
+          <div><strong>{{e.title}}</strong>{% if e.detail %}<p>{{e.detail}}</p>{% endif %}{% if e.evidence %}{{ chips([e.evidence]) }}{% endif %}</div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- ============================== TRENDS & ANOMALIES -->
+  <section class="panel" id="trends">
+    <h2>Sustained trends</h2>
+    <p class="muted">Deliverable 1 compared only the first and last reading. Deliverable 2 tests whether a change is <em>consistent</em> over time (Mann-Kendall test) and estimates its speed (Theil-Sen slope). Daily data is first averaged per week.</p>
+    <div class="table-wrap"><table class="trend-table">
+      <thead><tr><th>Measure</th><th>Pattern</th><th>Earlier → recent</th><th>Change</th><th>Per month</th><th>Points</th><th>p-value</th><th>Evidence</th></tr></thead>
+      <tbody>{% for t in a.trends %}<tr class="{{ '' if t.sustained else 'muted-row' }}">
+        <td>{{t.label}}</td><td><span class="dir dir-{{t.direction}}">{{ '▲ rising' if t.direction=='rising' else '▼ falling' if t.direction=='falling' else 'no consistent trend' }}</span></td>
+        <td>{{t.baseline}} → {{t.recent}} {{t.unit}}</td><td>{{'%+.1f'|format(t.change_pct)}}%</td><td>{{'%+.2f'|format(t.slope_per_month)}}</td><td>{{t.n}}</td><td>{{ '< 0.001' if t.p_value < 0.001 else t.p_value }}</td>
+        <td>{% if t.evidence %}{{ chips([t.evidence]) }}{% endif %}</td></tr>{% endfor %}</tbody>
+    </table></div>
+
+    <h2 class="mt">Multi-signal unusual days</h2>
+    {% if a.co_occurrences %}{% for c in a.co_occurrences %}<div class="insight"><strong>{{c.date}}</strong>: {{ c.signals|join(', ') }} unusual together{% if c.symptoms %}; symptoms nearby: {{c.symptoms|join(', ')}}{% endif %}. {{ chips([c.evidence] + c.linked) }}</div>{% endfor %}
+    {% else %}<p class="muted">No days where two or more different signals were unusual at the same time.</p>{% endif %}
+
+    <h2 class="mt">Unusual readings (personal baseline)</h2>
+    <p class="muted">A reading is unusual when it is far from this person's own previous 28 days (robust z-score ≥ 3.5) <em>and</em> the difference is practically large.</p>
+    {% if a.anomalies %}<div class="anomaly-grid">{% for x in a.anomalies %}<article class="anomaly-card">
+      <strong>{{x.label}}</strong><span class="pill">{{x.direction}} than usual</span>
+      <div class="warning-reading small-reading">{{x.value}} <small>{{x.unit}}</small></div>
+      <p class="small">Typical: {{x.typical}} {{x.unit}} · {{x.start}}{% if x.days > 1 %} – {{x.end}} ({{x.days}} days){% endif %} · z = {{x.z}}</p>{{ chips([x.evidence]) }}</article>{% endfor %}</div>
+    {% else %}<p class="muted">No unusual readings detected.</p>{% endif %}
+
+    <h2 class="mt">Signals that moved together</h2>
+    {% if a.relationships %}{% for r in a.relationships %}<div class="insight">{{r.label_a}} &amp; {{r.label_b}}: Spearman ρ = {{'%+.2f'|format(r.rho)}} across {{r.weeks}} weeks. {{ chips([r.evidence]) }}</div>{% endfor %}
+    <p class="note">Correlation shows co-movement only, not cause and effect.</p>
+    {% else %}<p class="muted">No strong week-to-week relationships (|ρ| ≥ 0.5) between the tracked signal pairs.</p>{% endif %}
+  </section>
+
+  <!-- ============================== CHARTS -->
+  <section class="panel" id="charts">
+    <h2>Longitudinal measurements</h2>
+    <p class="muted">Dashed line = Theil-Sen trend (shown only for sustained trends). Red points = unusual readings. Shaded band = reference range from the workbook (labs).</p>
+    <select id="metricSelect" aria-label="Choose measure"></select>
+    <div class="chart-wrap"><canvas id="healthChart"></canvas></div>
+    <h3>Health metrics at a glance</h3>
+    <div class="mini-chart-grid" id="miniCharts"></div>
+  </section>
+
+  <!-- ============================== DATA QUALITY -->
+  <section class="panel" id="quality">
+    <h2>Data quality &amp; missing data</h2>
+    <p class="muted">Record window: <strong>{{a.data_quality.window.start}}</strong> to <strong>{{a.data_quality.window.end}}</strong> ({{a.data_quality.window.days}} days). Missing data is reported, never silently filled in.</p>
+    <div class="table-wrap"><table><thead><tr><th>Source</th><th>Status</th><th>Coverage</th><th>Detail</th></tr></thead><tbody>
+      {% for s in a.data_quality.sources %}<tr><td>{{s.source}}</td><td><span class="pill q-{{s.status|replace('/','')}}">{{s.status}}</span></td>
+      <td>{% if s.coverage is not none %}<div class="bar"><span style="width:{{s.coverage}}%"></span></div> {{s.coverage}}%{% else %}—{% endif %}</td><td class="wrap">{{s.detail}}</td></tr>{% endfor %}
+    </tbody></table></div>
+    <h3 class="mt">How HealthLens handles missing data</h3>
+    <ul class="plain">
+      <li>Blank cells are dropped per measure; nothing is interpolated or imputed.</li>
+      <li>Daily data is averaged per week before trend tests, so a few missing days do not create false trends.</li>
+      <li>Trends need at least 8 weeks of data (or 3 lab draws); anomalies need 14 prior days of baseline.</li>
+      <li>Scenario checks report "no data" for missing signals instead of treating them as normal.</li>
+      <li>Data limitations are passed to the LLM as evidence so explanations can mention them.</li>
+    </ul>
+    <div>{{ chips(a.data_quality.evidence) }}</div>
+  </section>
+
+  <!-- ============================== MEDICATIONS -->
+  <section class="panel" id="meds">
+    <h2>Medication timing &amp; adherence context</h2>
+    <p class="muted">Averages before vs after each medication start. This shows timing only. It does not show that a medication caused a change, and effects are not inferred.</p>
+    {% set mc = a.medication_context|rejectattr('metric','equalto','adherence')|list %}
+    {% if mc %}<div class="table-wrap"><table><thead><tr><th>Medication</th><th>Started</th><th>Measure</th><th>Before</th><th>After</th><th>Evidence</th></tr></thead><tbody>
+      {% for m in mc %}<tr><td>{{m.medication}}</td><td>{{m.start}}</td><td>{{m.label}}</td><td>{{m.before}} {{m.unit}}</td><td>{{m.after}} {{m.unit}}</td><td>{{ chips([m.evidence]) }}</td></tr>{% endfor %}
+    </tbody></table></div>{% else %}<p class="muted">Not enough measurements around medication start dates for a before/after comparison.</p>{% endif %}
+    {% set ad = a.medication_context|selectattr('metric','equalto','adherence')|list %}
+    {% if ad %}<h3 class="mt">Estimated adherence</h3><div class="adherence">{% for m in ad %}<div><span>{{m.medication}}</span><div class="bar"><span style="width:{{m.after}}%"></span></div><strong>{{m.after}}%</strong>{{ chips([m.evidence]) }}</div>{% endfor %}</div>{% endif %}
+    <h3 class="mt">Medication history</h3>
+    <div class="table-wrap"><table><thead><tr>{% for col in meds.columns %}<th>{{col}}</th>{% endfor %}</tr></thead><tbody>{% for row in meds.rows %}<tr>{% for cell in row %}<td>{{cell}}</td>{% endfor %}</tr>{% endfor %}</tbody></table></div>
+  </section>
+
+  <!-- ============================== HISTORY -->
+  <section class="panel" id="history">
+    <h2>Diagnosis &amp; condition history</h2>
+    <p class="muted">Recorded entries from the workbook. HealthLens displays these; it never creates diagnoses.</p>
+    {% if history %}<div class="history-timeline">{% for event in history %}<article class="history-entry"><strong>{{event.date}} · {{event.source}}</strong><p>{{event.detail}}</p></article>{% endfor %}</div>
+    {% else %}<p class="no-flags">No structured diagnosis or condition history sheet was found for this patient. Absence of records does not mean absence of a condition.</p>{% endif %}
+  </section>
+
+  <!-- ============================== EVIDENCE -->
+  <section class="panel" id="evidence">
+    <h2>Evidence register</h2>
+    <p class="muted">Every insight and every AI sentence traces back to one of these items. Click an E-number anywhere on the page to see it.</p>
+    <div class="table-wrap tall"><table><thead><tr><th>ID</th><th>Type</th><th>Statement</th><th>Method</th><th>Source</th></tr></thead><tbody>
+      {% for e in a.evidence %}<tr id="row-{{e.id}}"><td><strong>{{e.id}}</strong></td><td>{{e.kind|replace('_',' ')}}</td><td class="wrap">{{e.text}}</td><td class="wrap small">{{e.method}}</td><td class="small">{{e.source}}</td></tr>{% endfor %}
+    </tbody></table></div>
+  </section>
+
+  <!-- ============================== PREVIEW -->
+  <section class="panel" id="preview">
+    <h2>Original workbook data</h2>
+    <label>Sheet<select id="sheetSelect"></select></label>
+    <div class="table-wrap" id="sheetTable"></div>
+  </section>
+
+  <p class="note">Educational proof of concept using synthetic data. Not a medical device. No diagnoses, risk predictions or treatment advice are generated. This demo has no per-patient access authorization and must not be used with real health records.</p>
+  <div class="ev-pop" id="evPop" role="dialog" hidden></div>
+  <script type="application/json" id="dashboardData">{{ {'charts':a.charts,'chart_order':a.charts.keys()|list,'sheets':sheets,'evidence':a.evidence,'patient':selected,'source':source,'csrf':upload_csrf}|tojson }}</script>
+  {% endif %}
+</main>
+{% endblock %}
