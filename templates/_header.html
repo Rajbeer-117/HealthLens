@@ -1,0 +1,18 @@
+<header class="site-header dashboard-header">
+  <div class="brand small">✿ Health<span>Lens</span></div>
+  <nav class="main-nav">
+    <a href="{{url_for('dashboard')}}" class="{{ 'active' if request.endpoint=='dashboard' else '' }}">Dashboard</a>
+    <a href="{{url_for('ai_page')}}" class="{{ 'active' if request.endpoint=='ai_page' else '' }}">✦ AI Integration</a>
+  </nav>
+  <div class="header-right">
+    {% if ai_status %}<a href="{{url_for('ai_page')}}" class="ai-badge {{ 'on' if ai_status.provider != 'offline' else 'off' }}" title="{{ai_status.note}}"><span class="dot {{ 'ok' if ai_status.provider != 'offline' else 'warn' }}"></span>AI: {{ ai_status.label if ai_status.provider=='offline' else ai_status.model }}</a>{% endif %}
+    <details class="account-menu">
+      <summary class="account-trigger" aria-label="Open account menu"><span class="account-avatar" aria-hidden="true">{{ (account.username if account else username)[0]|upper }}</span><span class="account-trigger-name">{{ account.username if account else username }}</span><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></summary>
+      <div class="account-dropdown">
+        <div class="account-summary"><span class="account-avatar large" aria-hidden="true">{{ (account.username if account else username)[0]|upper }}</span><div class="account-info"><strong>{{ account.username if account else username }}</strong><span>{{ account.email if account else 'Email unavailable' }}</span></div></div>
+        <div class="account-divider"></div>
+        <form action="{{url_for('logout')}}" method="post"><button class="account-logout" type="submit"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></svg> Log out</button></form>
+      </div>
+    </details>
+  </div>
+</header>
