@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}AI Integration | HealthLens{% endblock %}
+{% block content %}
+{% include '_header.html' %}
+<main class="dashboard ai-page">
+  <div class="dashboard-title">
+    <div>
+      <p class="eyebrow">UNIVERSITY OF WINDSOR · GROUP 7 · DELIVERABLE 2</p>
+      <h1>AI Integration</h1>
+      <p class="muted">How HealthLens uses a Large Language Model (LLM), safely, to explain health patterns.</p>
+    </div>
+  </div>
+
+  <section class="panel active ai-status-card">
+    <div class="ai-head">
+      <div>
+        <p class="eyebrow">1 · LIVE LLM CONNECTION</p>
+        <h2>{{ ai.display }}</h2>
+        <p class="small">Provider: <strong>{{ ai.label }}</strong>{% if ai.provider != 'offline' %} · model id <code>{{ ai.model }}</code>{% endif %} · Default LLM for this project: <strong>Meta Llama 3.2 (3B)</strong>, run locally with Ollama</p>
+        <p class="muted">{{ ai.note }}</p>
+      </div>
+      <div class="ai-provider"><span class="dot {{ 'ok' if ai.provider != 'offline' else 'warn' }}"></span><div><strong>{{ 'Connected' if ai.provider != 'offline' else 'Not connected' }}</strong><small>provider: {{ ai.provider }}</small></div></div>
+    </div>
+    <button class="btn" id="testBtn" type="button">⚡ Test LLM connection</button>
+    <div id="testOut" class="test-out" hidden></div>
+    <p class="note">The test sends a tiny prompt with no health data and shows the model's raw reply and response time.</p>
+  </section>
+
+  <section class="panel active">
+    <p class="eyebrow">2 · WHERE THE LLM IS USED</p>
+    <div class="use-grid">
+      <a class="use-card" href="{{url_for('dashboard')}}#ai"><strong>✦ AI Health Summary</strong><span>Turns the engine's evidence into a plain-language summary, questions for a clinician and limitations. Every point cites evidence (E1, E2…).</span></a>
+      <a class="use-card" href="{{url_for('dashboard')}}#ai"><strong>💬 Ask HealthLens</strong><span>Answers questions about one patient's record, using only that patient's evidence.</span></a>
+      <a class="use-card" href="{{url_for('dashboard')}}#ai"><strong>🔍 AI transparency</strong><span>Under each answer: the exact prompt sent, the raw LLM output and the guardrail result.</span></a>
+    </div>
+  </section>
+
+  <section class="panel active">
+    <p class="eyebrow">3 · AI PIPELINE</p>
+    <div class="flow">
+      <div><b>Excel workbook</b><small>11 sheets</small></div><i>→</i>
+      <div><b>Statistics engine</b><small>trends · anomalies · scenarios</small></div><i>→</i>
+      <div><b>Evidence E1…En</b><small>facts + method + source</small></div><i>→</i>
+      <div><b>De-identify</b><small>no ID, relative dates</small></div><i>→</i>
+      <div class="hl"><b>LLM</b><small>{{ ai.model }}</small></div><i>→</i>
+      <div><b>Guardrails</b><small>reject → retry → fallback</small></div><i>→</i>
+      <div><b>Dashboard</b><small>cited explanation</small></div>
+    </div>
+    <div class="ai-two">
+      <div class="ai-box"><h3>Guardrails: LLM replies are rejected if they contain</h3><ul>{% for g in guardrails %}<li>{{ g }}</li>{% endfor %}<li>evidence IDs that don't exist / points without evidence</li><li>invalid JSON</li></ul></div>
+      <div class="ai-box"><h3>Questions answered safely without the LLM</h3><ul>{% for s in screens %}<li>{{ {'acute':'Acute symptoms (e.g. chest pain): points to professional/emergency help','diagnosis':'Diagnosis requests ("Do I have…?")','medication':'Medication or dose changes'}[s] }}</li>{% endfor %}</ul>
+        <h3 class="mt">Privacy</h3><ul><li>Sent: age band, sex, computed evidence with relative dates</li><li>Never sent: patient ID, name, calendar dates, raw rows</li><li>With Ollama, nothing leaves this computer</li></ul></div>
+    </div>
+    <details class="pipeline"><summary>View the system prompt given to the LLM</summary><pre>{{ system_prompt }}</pre></details>
+  </section>
+
+  <section class="panel active">
+    <p class="eyebrow">4 · AI AUDIT LOG (latest 30 calls)</p>
+    <p class="muted small">Stored in <code>logs/ai_audit.jsonl</code>. No question text or health values are logged.</p>
+    {% if audit %}
+    <div class="table-wrap"><table><thead><tr><th>Time (UTC)</th><th>Action</th><th>Patient</th><th>Provider</th><th>Model</th><th>Result</th><th>Guardrails</th><th>Latency</th></tr></thead><tbody>
+      {% for r in audit %}<tr><td>{{ r.ts[:19]|replace('T',' ') }}</td><td>{{ r.action }}</td><td>{{ r.patient }}</td><td>{{ r.provider }}</td><td>{{ r.model }}</td>
+      <td><span class="pill mode-{{ r.mode }}">{{ {'llm':'LLM','offline':'offline','fallback':'fallback','screened':'screened','error':'error'}.get(r.mode, r.mode) }}</span></td>
+      <td>{{ '✓ passed' if r.guardrails_passed else ('—' if r.guardrails_passed is none else '✗ ' ~ r.issues ~ ' issue(s)') }}</td><td>{{ ((r.latency_ms or 0)/1000)|round(1) }} s</td></tr>{% endfor %}
+    </tbody></table></div>
+    {% else %}<p class="muted">No AI calls yet. Open the dashboard to generate a summary.</p>{% endif %}
+  </section>
+</main>
+<script>
+document.getElementById('testBtn').addEventListener('click', async () => {
+  const out = document.getElementById('testOut'), btn = document.getElementById('testBtn');
+  btn.disabled = true; out.hidden = false; out.className = 'test-out'; out.textContent = 'Contacting the LLM… (the first call can take up to a minute while the model loads)';
+  try {
+    const res = await fetch('{{ url_for("api_llm_test") }}', {method: 'POST', headers: {'X-CSRF-Token': '{{ upload_csrf }}'}});
+    const r = await res.json();
+    out.className = 'test-out ' + (r.ok ? 'good' : 'bad');
+    out.textContent = r.ok ? `✓ Connected to ${r.label} (${r.model}) in ${(r.latency_ms/1000).toFixed(1)} s\nRaw reply: ${r.reply}`
+                           : `✗ Not connected: ${r.error}`;
+  } catch (e) { out.className = 'test-out bad'; out.textContent = 'Error: ' + e.message; }
+  finally { btn.disabled = false; }
+});
+</script>
+{% endblock %}
