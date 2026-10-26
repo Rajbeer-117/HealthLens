@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+*.sqlite3
+.env
+logs/
+local_uploads/
+.pytest_cache/
+patient_data.zip
