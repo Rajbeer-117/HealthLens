@@ -3,7 +3,11 @@ from datetime import datetime, timezone
 from functools import wraps
 from pathlib import Path
 import pandas as pd
-from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, abort
+
+from healthlens import analyze_book
+from healthlens import llm
+from healthlens.data import clean_sheet
 
 ROOT = Path(__file__).resolve().parent
 app = Flask(__name__)
@@ -174,88 +178,16 @@ def prepare(frame):
         frame=frame.dropna(subset=['Date']).sort_values('Date')
     return frame
 
-def chart_series(book):
-    output={}
-    labs=prepare(book.get('Lab Results',pd.DataFrame()))
-    vitals=prepare(book.get('Vitals Daily',pd.DataFrame()))
-    wear=prepare(book.get('Wearable Daily',pd.DataFrame()))
-    if {'Test Name','Result','Date'}.issubset(labs.columns):
-        for name in ['Fasting glucose','HbA1c','LDL','HDL']:
-            sub=labs[labs['Test Name'].astype(str).str.casefold()==name.casefold()]
-            output['Labs · '+name]=series(sub,'Result')
-    for group,frame,cols in [('Vitals',vitals,['Systolic BP','Diastolic BP','Weight kg','Resting HR']),('Wearables',wear,['Steps','Sleep Hours','Active Minutes'])]:
-        for col in cols:
-            if col in frame.columns: output[group+' · '+col]=series(frame,col)
-    return {k:v for k,v in output.items() if v}
-
-def series(frame,col):
-    if 'Date' not in frame.columns or col not in frame.columns: return []
-    sub=frame[['Date',col]].copy()
-    sub[col]=pd.to_numeric(sub[col],errors='coerce')
-    sub=sub.dropna().sort_values('Date')
-    return [{'date':row['Date'].strftime('%Y-%m-%d'),'value':float(row[col])} for _,row in sub.iterrows()]
-
-def observation(label,values,unit=''):
-    if len(values)<3: return None
-    a,b=values[0],values[-1]
-    delta=b['value']-a['value']
-    verb='increased' if delta>0 else 'decreased' if delta<0 else 'was unchanged'
-    return f'{label} {verb} from {a["value"]:,.1f} to {b["value"]:,.1f} {unit} between {a["date"]} and {b["date"]} ({len(values)} observations).'
-
 def safe_rows(frame,limit=150):
-    clean=frame.dropna(how='all').head(limit).copy()
-    clean=clean.where(pd.notna(clean),None)
-    return {'columns':[str(x) for x in clean.columns],'rows':[[str(v) if v is not None else '' for v in row] for row in clean.itertuples(index=False,name=None)]}
+    """Table preview: dates shown as YYYY-MM-DD (Excel serials converted), blanks shown empty."""
+    clean=clean_sheet(frame).head(limit)
+    def cell(v):
+        if v is None or (not isinstance(v,str) and pd.isna(v)): return ''
+        if isinstance(v,pd.Timestamp): return v.strftime('%Y-%m-%d')
+        return str(v)
+    return {'columns':[str(x) for x in clean.columns],'rows':[[cell(v) for v in row] for row in clean.itertuples(index=False,name=None)]}
 
-# Educational reference thresholds, not personalized clinical decision rules.
-# These values are illustrative adult screening cutoffs and require clinical context.
-REFERENCE_RULES = {
-    'Labs · Fasting glucose': (70, 99, 'mg/dL'),
-    'Labs · HbA1c': (0, 5.6, '%'),
-    'Labs · LDL': (0, 99, 'mg/dL'),
-    'Labs · HDL': (40, None, 'mg/dL'),
-    'Vitals · Systolic BP': (90, 119, 'mmHg'),
-    'Vitals · Diastolic BP': (60, 79, 'mmHg'),
-    'Vitals · Resting HR': (60, 100, 'bpm'),
-}
-
-def health_flags(charts):
-    flags=[]
-    for name, (low, high, unit) in REFERENCE_RULES.items():
-        points=charts.get(name, [])
-        if not points: continue
-        latest=points[-1]
-        value=latest['value']
-        if (low is not None and value < low) or (high is not None and value > high):
-            range_text=(f'{low}–{high}' if low is not None and high is not None else
-                        f'≥{low}' if low is not None else f'≤{high}')
-            flags.append({'metric':name.split(' · ')[-1], 'value':f'{value:g}',
-                          'unit':unit, 'date':latest['date'], 'reference':range_text,
-                          'severity':'Review',
-                          'message':'Latest recorded value is outside the illustrative adult reference range. Discuss with a qualified clinician; interpretation depends on your health context.'})
-    return flags
-
-def longitudinal_insights(charts):
-    """Descriptive, non-diagnostic changes; no risk prediction or medical inference."""
-    findings=[]
-    for metric,points in charts.items():
-        if len(points)<4: continue
-        recent=points[-4:]
-        baseline=points[:-4]
-        if len(baseline)<3: continue
-        old=sum(x['value'] for x in baseline)/len(baseline)
-        new=sum(x['value'] for x in recent)/len(recent)
-        if abs(old)<1e-9: continue
-        pct=(new-old)/abs(old)*100
-        # Only report changes, not whether they are medically harmful.
-        if abs(pct)<15: continue
-        findings.append({'metric':metric,'change':round(pct,1),
-          'baseline':round(old,2),'recent':round(new,2),
-          'date':recent[-1]['date'],'count':len(points),
-          'evidence':f'Average of {len(baseline)} earlier measurements compared with the most recent 4.',
-          'interpretation':'Change detected; significance is unknown without clinical context, measurement conditions and individual baseline.'})
-    return sorted(findings,key=lambda x:abs(x['change']),reverse=True)[:12]
-
+# Deliverable 1 diagnosis-history reader (still used by the Diagnosis History tab)
 def history_events(book):
     events=[]
     for sheet_name,frame in book.items():
@@ -269,28 +201,165 @@ def history_events(book):
             events.append({'date':str(date)[:10],'source':sheet_name,'detail':detail[:450]})
     return sorted(events,key=lambda x:x['date'],reverse=True)[:100]
 
+# ---------------------------------------------------------------- Deliverable 2: analysis engine + AI layer
+
+VITAL_RULES = {'sbp': (90, 119), 'dbp': (60, 79), 'rhr': (60, 100)}  # illustrative adult ranges, not clinical rules
+
+
+def get_book(source, pid):
+    """Return (workbook dict, cache key) for a demo or uploaded patient, or (None, None)."""
+    if source == 'uploaded':
+        members = uploaded_members()
+        if pid not in members: return None, None
+        path = members[pid]
+        return (lambda: pd.read_excel(path, sheet_name=None, engine='openpyxl')), f'u{session["uid"]}:{pid}:{path.stat().st_mtime}'
+    members = patient_members()
+    if pid not in members: return None, None
+    return (lambda: load_book(members[pid])), f'demo:{pid}'
+
+
+_analysis_cache = {}
+
+
+def get_analysis(source, pid):
+    loader, key = get_book(source, pid)
+    if loader is None: return None, None
+    if key not in _analysis_cache:
+        book = loader()
+        if len(_analysis_cache) > 64: _analysis_cache.pop(next(iter(_analysis_cache)))
+        _analysis_cache[key] = (book, analyze_book(book))
+    return _analysis_cache[key]
+
+
+def health_flags_v2(analysis):
+    """Latest-value review flags: lab values use the workbook's own reference range; vitals use illustrative ranges."""
+    flags = []
+    for f in analysis['lab_flags']:
+        if f['state'] == 'within': continue
+        flags.append({'metric': f['label'], 'value': f'{f["latest"]:g}', 'unit': f['unit'], 'date': f['date'],
+                      'reference': f['reference'], 'severity': 'Review', 'evidence': f['evidence'],
+                      'message': f'Latest result is {f["state"]} the reference range listed in the workbook ({f["outside"]} of {f["draws"]} draws outside). Discuss with a qualified clinician; interpretation depends on your health context.'})
+    for key, (low, high) in VITAL_RULES.items():
+        c = analysis['charts'].get(key)
+        if not c or not c['points']: continue
+        last = c['points'][-1]
+        if last['value'] < low or last['value'] > high:
+            flags.append({'metric': c['label'], 'value': f'{last["value"]:g}', 'unit': c['unit'], 'date': last['date'],
+                          'reference': f'{low}–{high}', 'severity': 'Review', 'evidence': None,
+                          'message': 'Latest daily reading is outside an illustrative adult range. A single reading varies day to day; see the Trends tab for the longer pattern.'})
+    return flags
+
+
+def csrf_token():
+    return session.setdefault('upload_csrf', secrets.token_urlsafe(24))
+
+
+def api_auth(fn):
+    @wraps(fn)
+    def inner(*args, **kwargs):
+        if not session.get('uid'): return jsonify({'error': 'Not signed in'}), 401
+        if request.method == 'POST' and request.headers.get('X-CSRF-Token') != session.get('upload_csrf'):
+            return jsonify({'error': 'CSRF check failed. Refresh the page.'}), 400
+        return fn(*args, **kwargs)
+    return inner
+
+
+def _source(value):
+    return value if value in ('demo', 'uploaded') else 'demo'
+
+
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    source=request.args.get('source','demo')
-    if source not in ('demo','uploaded'): source='demo'
-    members=uploaded_members() if source=='uploaded' else patient_members()
-    if not members: return render_template('dashboard.html',username=session['username'],error=('No uploaded patient workbooks yet. Upload an XLSX file or ZIP archive below.' if source=='uploaded' else 'patient_data.zip not found or contains no .xlsx workbooks'),patients=[],selected='',source=source,upload_csrf=session.setdefault('upload_csrf',secrets.token_urlsafe(24)),profile={},charts={},flags=[],insights=[],history=[],observations=[],meds={'columns':[],'rows':[]},sheets={})
-    ids=sorted(members)
-    selected=request.args.get('patient','PC0101')
-    if selected not in members: selected=ids[0]
-    book=(pd.read_excel(members[selected],sheet_name=None,engine='openpyxl') if source=='uploaded' else load_book(members[selected]))
-    profile=book.get('Patient Profile',pd.DataFrame())
-    info=dict(zip(profile.get('Field',[]),profile.get('Value',[])))
-    charts=chart_series(book)
-    flags=health_flags(charts)
-    insights=longitudinal_insights(charts)
-    history=history_events(book)
-    units={'Labs · Fasting glucose':'mg/dL','Vitals · Systolic BP':'mmHg','Vitals · Weight kg':'kg','Wearables · Steps':'steps','Wearables · Sleep Hours':'hours'}
-    chosen=['Labs · Fasting glucose','Vitals · Systolic BP','Vitals · Weight kg','Wearables · Steps','Wearables · Sleep Hours']
-    observations=[observation(key.split(' · ')[-1],charts.get(key,[]),units.get(key,'')) for key in chosen]
-    observations=[x for x in observations if x]
-    return render_template('dashboard.html',username=session['username'],error=None,patients=ids,selected=selected,source=source,upload_csrf=session.setdefault('upload_csrf',secrets.token_urlsafe(24)),profile=info,charts=charts,flags=flags,insights=insights,history=history,observations=observations,meds=safe_rows(book.get('Medication History',pd.DataFrame())),sheets={k:safe_rows(v) for k,v in book.items()})
+    source = _source(request.args.get('source', 'demo'))
+    members = uploaded_members() if source == 'uploaded' else patient_members()
+    empty = dict(username=session['username'], patients=[], selected='', source=source, upload_csrf=csrf_token(),
+                 profile={}, flags=[], history=[], meds={'columns': [], 'rows': []}, sheets={}, a=None, ai=llm.status())
+    if not members:
+        return render_template('dashboard.html', error=('No uploaded patient workbooks yet. Upload an XLSX file or ZIP archive below.' if source == 'uploaded' else 'patient_data.zip not found or contains no .xlsx workbooks'), **empty)
+    ids = sorted(members)
+    selected = request.args.get('patient', 'PC0101')
+    if selected not in members: selected = ids[0]
+    book, analysis = get_analysis(source, selected)
+    profile = book.get('Patient Profile', pd.DataFrame())
+    info = dict(zip(profile.get('Field', []), profile.get('Value', [])))
+    return render_template('dashboard.html', username=session['username'], error=None, patients=ids, selected=selected,
+                           source=source, upload_csrf=csrf_token(), profile=info, flags=health_flags_v2(analysis),
+                           history=history_events(book), meds=safe_rows(book.get('Medication History', pd.DataFrame())),
+                           sheets={k: safe_rows(v) for k, v in book.items()}, a=analysis, ai=llm.status())
+
+
+@app.route('/ai')
+@login_required
+def ai_page():
+    """AI Integration page: live LLM status, connection test, pipeline, guardrails and audit log."""
+    return render_template('ai.html', username=session['username'], ai=llm.status(), upload_csrf=csrf_token(),
+                           audit=llm.read_audit(30), system_prompt=llm.SYSTEM_PROMPT,
+                           guardrails=sorted({name for name, _ in llm.GUARDRAILS}),
+                           screens=[k for k, _, _ in llm.SCREENS])
+
+
+@app.context_processor
+def ai_badge():
+    return {'ai_status': llm.status() if session.get('uid') else None}
+
+
+# ---------------------------------------------------------------- REST API
+
+@app.route('/api/llm/test', methods=['POST'])
+@api_auth
+def api_llm_test():
+    result = llm.test_connection()
+    llm.audit(session['uid'], '-', 'connection-test', {**result, 'mode': 'llm' if result['ok'] else 'error',
+                                                         'guardrails': {'passed': None, 'issues': []}})
+    return jsonify(result)
+
+
+@app.route('/api/llm/status')
+@api_auth
+def api_llm_status():
+    return jsonify(llm.status())
+
+
+@app.route('/api/patients')
+@api_auth
+def api_patients():
+    source = _source(request.args.get('source', 'demo'))
+    members = uploaded_members() if source == 'uploaded' else patient_members()
+    return jsonify({'source': source, 'patients': sorted(members)})
+
+
+@app.route('/api/patients/<pid>/analysis')
+@api_auth
+def api_analysis(pid):
+    _, analysis = get_analysis(_source(request.args.get('source', 'demo')), pid)
+    if analysis is None: return jsonify({'error': 'Patient not found'}), 404
+    return jsonify(analysis)
+
+
+@app.route('/api/patients/<pid>/ai-summary', methods=['POST'])
+@api_auth
+def api_ai_summary(pid):
+    body = request.get_json(silent=True) or {}
+    _, analysis = get_analysis(_source(body.get('source', 'demo')), pid)
+    if analysis is None: return jsonify({'error': 'Patient not found'}), 404
+    result = llm.summarize(analysis)
+    llm.audit(session['uid'], pid, 'ai-summary', result)
+    return jsonify(result)
+
+
+@app.route('/api/patients/<pid>/ask', methods=['POST'])
+@api_auth
+def api_ask(pid):
+    body = request.get_json(silent=True) or {}
+    question = str(body.get('question', '')).strip()
+    if not 3 <= len(question) <= 500: return jsonify({'error': 'Ask a question between 3 and 500 characters.'}), 400
+    _, analysis = get_analysis(_source(body.get('source', 'demo')), pid)
+    if analysis is None: return jsonify({'error': 'Patient not found'}), 404
+    result = llm.ask(analysis, question)
+    llm.audit(session['uid'], pid, 'ask', result)
+    return jsonify(result)
+
 
 if __name__=='__main__':
     app.run(debug=True,host='127.0.0.1',port=5000)
