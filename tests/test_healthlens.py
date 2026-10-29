@@ -196,23 +196,15 @@ def test_api_flow(client):
     assert 'PC0101' in client.get('/api/patients').get_json()['patients']
     a = client.get('/api/patients/PC0101/analysis').get_json()
     assert a['evidence'] and a['scenarios']
-    page = client.get('/dashboard?patient=PC0101')
+    page = client.get('/summary?patient=PC0101')
     assert page.status_code == 200
     with client.session_transaction() as s:
         token = s['upload_csrf']
-    assert client.post('/api/patients/PC0101/ai-summary', json={}).status_code == 400  # no CSRF header
-    r = client.post('/api/patients/PC0101/ai-summary', json={'source': 'demo'}, headers={'X-CSRF-Token': token})
-    assert r.status_code == 200 and r.get_json()['points']
+    assert client.post('/api/patients/PC0101/ask', json={'question': 'How is my sleep?'}).status_code == 400  # no CSRF header
+    r = client.post('/api/patients/PC0101/ask', json={'question': 'How is my sleep?'}, headers={'X-CSRF-Token': token})
+    assert r.status_code == 200 and r.get_json()['answer']
     r = client.post('/api/patients/PC0101/ask', json={'question': 'Do I have diabetes?'}, headers={'X-CSRF-Token': token})
     assert r.get_json()['mode'] == 'screened'
-
-
-def test_ai_integration_page_and_connection_test(client):
-    assert client.get('/ai').status_code == 200
-    with client.session_transaction() as s:
-        token = s['upload_csrf']
-    r = client.post('/api/llm/test', headers={'X-CSRF-Token': token}).get_json()
-    assert 'ok' in r and 'provider' in r
 
 
 def test_summary_includes_deidentified_trace(a101):
