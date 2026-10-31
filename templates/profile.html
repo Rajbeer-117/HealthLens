@@ -1,0 +1,61 @@
+{% extends 'app_base.html' %}
+{% block title %}Profile | HealthLens{% endblock %}
+{% block page %}
+<div class="dashboard-title">
+  <div>
+    <p class="eyebrow">PROFILE</p>
+    <h1>Profile</h1>
+    <p class="muted">Your account details and the medical record of the selected patient.</p>
+  </div>
+  {% include '_patient_bar.html' %}
+</div>
+
+<div class="profile-grid">
+  <section class="card">
+    <p class="eyebrow">ACCOUNT</p>
+    <div class="account-head"><span class="account-avatar large" aria-hidden="true">{{ user.username[0]|upper }}</span><div><h2>{{user.username}}</h2><span class="muted small">HealthLens account</span></div></div>
+    <dl class="kv">
+      <dt>Username</dt><dd>{{user.username}}</dd>
+      <dt>Email</dt><dd>{{user.email}}</dd>
+      <dt>Member since</dt><dd>{{member_since}}</dd>
+      <dt>Patient source</dt><dd>{{ 'My uploaded patients' if source=='uploaded' else 'Built-in demo patients' }}</dd>
+      <dt>Stored documents</dt><dd>{{doc_count}} · <a href="{{url_for('documents')}}">manage</a></dd>
+    </dl>
+  </section>
+
+  <section class="card">
+    <p class="eyebrow">PATIENT DETAILS</p>
+    <h2>{{ selected or 'No patient selected' }}</h2>
+    {% if fields %}
+    <dl class="kv">{% for k,v in fields %}<dt>{{k}}</dt><dd>{{v}}</dd>{% endfor %}</dl>
+    {% else %}<p class="muted">{{ 'Upload a patient workbook on the Documents page to see details here.' if source=='uploaded' else 'No patient profile found.' }}</p>{% endif %}
+  </section>
+</div>
+
+{% if selected %}
+<section class="card" id="history">
+  <p class="eyebrow">MEDICAL HISTORY</p>
+  <h2>Conditions &amp; findings</h2>
+  <p class="muted">Recorded entries from the workbook. HealthLens displays these as recorded; it never creates diagnoses.</p>
+  {% if history %}
+  <div class="history-timeline">{% for e in history %}
+    <article class="history-entry">
+      <div class="history-top"><strong>{{e.title}}</strong>{% if e.status %}<span class="pill">{{e.status}}</span>{% endif %}</div>
+      <p class="history-meta">{{ e.date or 'Not dated' }}{% if e.kind %} · {{e.kind}}{% endif %}</p>
+      {% if e.notes %}<p>{{e.notes}}</p>{% endif %}
+      {% if e.extra %}<p class="small muted">{{e.extra}}</p>{% endif %}
+    </article>{% endfor %}
+  </div>
+  {% else %}<p class="no-flags">No medical history entries were found for this patient. Absence of records does not mean absence of a condition.</p>{% endif %}
+</section>
+
+<section class="card" id="medications">
+  <p class="eyebrow">MEDICAL HISTORY</p>
+  <h2>Medications</h2>
+  {% if meds.rows %}
+  <div class="table-wrap"><table><thead><tr>{% for col in meds.columns %}<th>{{col}}</th>{% endfor %}</tr></thead><tbody>{% for row in meds.rows %}<tr>{% for cell in row %}<td>{{cell}}</td>{% endfor %}</tr>{% endfor %}</tbody></table></div>
+  {% else %}<p class="muted">No medication history was found for this patient.</p>{% endif %}
+</section>
+
+{% endif %}
+{% endblock %}

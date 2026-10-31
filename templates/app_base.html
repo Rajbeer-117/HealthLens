@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{# Shared frame for the three signed-in pages: header, page content, footer note and the floating chatbot. #}
+{% block content %}
+{% include '_header.html' %}
+<main class="dashboard">
+  {% block page %}{% endblock %}
+  <p class="note footnote">Educational proof of concept using synthetic data. Not a medical device. No diagnoses, risk predictions or treatment advice are generated. This demo has no per-patient access authorization and must not be used with real health records.</p>
+</main>
+{% include '_chat.html' %}
+{% endblock %}
+{% block scripts %}
+<script type="application/json" id="chatData">{{ {'patient': chat.patient, 'source': chat.source, 'csrf': chat.csrf}|tojson }}</script>
+{% block page_scripts %}{% endblock %}
+<script src="{{ url_for('static',filename='js/chat.js') }}"></script>
+{% endblock %}

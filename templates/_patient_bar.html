@@ -1,0 +1,13 @@
+{# Choose which patient the page shows. Needs: source, patients, selected. #}
+<div class="patient-bar">
+  <div class="source-toggle" role="group" aria-label="Patient source">
+    <a href="{{url_for(request.endpoint, source='demo')}}" class="{{ 'active' if source=='demo' else '' }}">Demo patients</a>
+    <a href="{{url_for(request.endpoint, source='uploaded')}}" class="{{ 'active' if source=='uploaded' else '' }}">My uploads</a>
+  </div>
+  {% if patients %}
+  <form method="get" class="patient-select">
+    <input type="hidden" name="source" value="{{source}}">
+    <label>Patient<select name="patient" onchange="this.form.submit()">{% for p in patients %}<option value="{{p}}" {% if p==selected %}selected{% endif %}>{{p}}</option>{% endfor %}</select></label>
+  </form>
+  {% endif %}
+</div>

@@ -1,0 +1,26 @@
+{# Left panel on the Summary page: the 3 categories and the data span. Needs: categories, category, span, spans, span_info. #}
+<aside class="category-panel" aria-label="Categories">
+  <p class="eyebrow">CATEGORIES</p>
+  <nav class="cat-list">
+    <a href="{{ url_for('summary', category='all') }}" class="cat-item {{ 'active' if category=='all' else '' }}">
+      <span class="cat-name">All measures</span>
+      <small>Everything in this record</small>
+    </a>
+    {% for c in categories %}{% set s = c.scenario %}
+    <a href="{{ url_for('summary', category=c.key) }}" class="cat-item status-{{ s.status if s else 'none' }} {{ 'active' if category==c.key else '' }}">
+      <span class="cat-name">{{ c.name }}</span>
+      {% if s %}<span class="pill status-{{ s.status }}">{{ s.status_text }}</span>
+      <small>{% if s.status in ('not_applicable','insufficient') %}{{ s.note or 'Not enough data in this span' }}{% else %}{{ s.signal_count }} of {{ s.checked }} signal groups{% endif %}</small>{% endif %}
+    </a>
+    {% endfor %}
+  </nav>
+
+  <div class="span-box">
+    <p class="eyebrow">DATA SPAN</p>
+    <div class="source-toggle span-toggle" role="group" aria-label="Data span">
+      {% for k, label in spans.items() %}<a href="{{ url_for('summary', span=k, category=category) }}" class="{{ 'active' if span==k else '' }}">{{ label }}</a>{% endfor %}
+    </div>
+    <small class="muted">Showing {{ span_info.start }} to {{ span_info.end }}</small>
+  </div>
+  <p class="note small">Categories count related signals. They are not risk scores or diagnoses.</p>
+</aside>

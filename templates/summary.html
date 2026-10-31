@@ -1,0 +1,108 @@
+{% extends 'app_base.html' %}
+{% block title %}Summary | HealthLens{% endblock %}
+{% block page %}
+<div class="dashboard-title">
+  <div>
+    <p class="eyebrow">SUMMARY</p>
+    <h1>Health summary</h1>
+    {% if selected %}<p class="muted">Overview for patient <strong>{{selected}}</strong></p>{% endif %}
+  </div>
+  {% include '_patient_bar.html' %}
+</div>
+
+{% if empty %}
+<section class="card empty-state">
+  <h2>No patient records to show yet</h2>
+  <p class="muted">{{ 'You have not uploaded any patient workbooks yet.' if source=='uploaded' else 'The built-in demo data (patient_data.zip) was not found or has no workbooks.' }}</p>
+  <p><a class="btn" href="{{url_for('documents')}}">Go to Documents</a> {% if source=='uploaded' %}<a class="btn ghost" href="{{url_for('summary', source='demo')}}">View demo patients</a>{% endif %}</p>
+</section>
+{% else %}
+
+<div class="summary-layout">
+{% include '_category_panel.html' %}
+<div class="summary-main">
+
+<div class="stats stats-5">
+  <div class="stat"><span>Patient ID</span><strong>{{selected}}</strong></div>
+  <div class="stat"><span>Age / Sex</span><strong>{{age}} · {{sex}}</strong></div>
+  <div class="stat"><span>Data span</span><strong>{{span_label}}</strong></div>
+  <div class="stat"><span>Active medications</span><strong>{{meds_active}}</strong></div>
+  <div class="stat"><span>Recent flags</span><strong>{{flags|length}}</strong></div>
+</div>
+
+{% if active_cat %}{% set sc = active_cat.scenario %}
+<section class="card category-detail" id="category">
+  <div class="section-heading"><div><p class="eyebrow">CATEGORY</p><h2>{{ active_cat.name }}</h2></div>
+    {% if sc %}<span class="pill status-{{ sc.status }}">{{ sc.status_text }}</span>{% endif %}</div>
+  <p class="muted">{{ active_cat.desc }}. Based on {{ span_label|lower }} of data ({{ span_info.start }} to {{ span_info.end }}). Readings, flags and charts below show only this category.</p>
+  {% if not sc or sc.status == 'not_applicable' %}
+  <p class="no-flags">{{ sc.note if sc else 'No data for this category.' }}</p>
+  {% else %}
+  <ul class="checks">
+    {% for c in sc.checks %}
+    <li class="check-{{c.status}}"><span class="check-icon" aria-hidden="true">{{ '●' if c.status=='signal' else '○' if c.status=='quiet' else '–' }}</span>
+      <div><strong>{{c.signal}}</strong><span>{{c.text}}</span></div></li>
+    {% endfor %}
+  </ul>
+  {% if sc.note %}<p class="note">{{ sc.note }}</p>{% endif %}
+  <p class="note">● noteworthy finding · ○ data present, nothing noteworthy · – no data in this span. A count of related signals, not a risk score or diagnosis.{% if span == '3m' %} Patterns that need a longer history (lab draws, menstrual cycles) may only appear with <a href="{{ url_for('summary', span='all', category=category) }}">Full record</a>.{% endif %}</p>
+  {% endif %}
+</section>
+{% endif %}
+
+{% if measures %}
+<section class="card" id="readings">
+  <p class="eyebrow">KEY READINGS</p>
+  <h2>Latest values</h2>
+  <p class="muted">Most recent recorded value for the main measures. The trend note appears only when the change was consistent over time.</p>
+  <div class="measure-grid">
+    {% for m in measures %}
+    <article class="measure">
+      <span class="measure-label">{{m.label}}</span>
+      <strong>{{m.value}} <small>{{m.unit}}</small></strong>
+      <span class="dir dir-{{m.direction}}">{% if m.direction=='rising' %}▲ Rising {{m.change}}{% elif m.direction=='falling' %}▼ Falling {{m.change}}{% else %}No consistent trend{% endif %}</span>
+      <span class="measure-date">Recorded {{m.date}}</span>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section class="warning-section" id="flags">
+  <div class="section-heading"><div><p class="eyebrow">HEALTH REVIEW</p><h2>Recent flags</h2></div><span class="flag-count">{{flags|length}} flagged indicator{{'s' if flags|length != 1 else ''}}</span></div>
+  <p class="muted">Lab values are compared with the reference range printed in the patient's own workbook; vitals use illustrative adult ranges. These are educational flags, not diagnoses.</p>
+  {% if flags %}
+  <div class="warning-grid">{% for flag in flags %}
+    <article class="warning-card">
+      <div class="warning-top"><span class="warning-icon">!</span><strong>{{flag.metric}}</strong><span class="warning-status">{{flag.severity}}</span></div>
+      <div class="warning-reading">{{flag.value}} <small>{{flag.unit}}</small></div>
+      <p>Reference: <strong>{{flag.reference}} {{flag.unit}}</strong> · Recorded {{flag.date}}</p>
+      <p>{{flag.message}}</p>
+    </article>{% endfor %}
+  </div>
+  {% else %}<div class="no-flags">No out-of-range latest values detected for the supported indicators. This does not establish that the patient is healthy.</div>{% endif %}
+  <p class="note">This prototype does not triage. For symptoms or concerns, contact a healthcare professional.</p>
+</section>
+
+<section class="card" id="trends">
+  <p class="eyebrow">TRENDS</p>
+  <h2>Trends over time</h2>
+  <p class="muted">Dashed line = trend line (shown only when the change was consistent over time). Shaded band = reference range from the workbook (labs).</p>
+  <div class="filter-row" id="groupFilters" aria-label="Filter measures"></div>
+  <div class="chart-controls"><label for="metricSelect" class="small muted">Measure</label><select id="metricSelect"></select></div>
+  <div class="chart-wrap"><canvas id="healthChart" role="img" aria-label="Chart of the selected measure over time"></canvas></div>
+  <p class="trend-note" id="trendNote"></p>
+  <h3 class="mt">All measures <span class="muted small">(click a chart to enlarge it)</span></h3>
+  <div class="mini-chart-grid" id="miniCharts"></div>
+</section>
+
+</div>
+</div>
+
+<script type="application/json" id="chartData">{{ chart_data|tojson }}</script>
+{% endif %}
+{% endblock %}
+{% block page_scripts %}
+<script src="{{ url_for('static',filename='vendor/chart.umd.js') }}"></script>
+<script src="{{ url_for('static',filename='js/charts.js') }}"></script>
+{% endblock %}

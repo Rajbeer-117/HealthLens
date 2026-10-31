@@ -1,0 +1,24 @@
+{# Floating chatbot, bottom-right on every signed-in page. Behaviour lives in static/js/chat.js. #}
+<div class="chat-widget" id="chatWidget">
+  <section class="chat-panel" id="chatPanel" role="dialog" aria-label="HealthLens assistant" hidden>
+    <header>
+      <div><strong>HealthLens assistant</strong><small><span class="dot {{ 'ok' if chat.connected else 'warn' }}"></span>{{ 'AI connected · ' ~ chat.display if chat.connected else 'Offline mode · template answers' }}</small></div>
+      <button type="button" class="chat-close" id="chatClose" aria-label="Close chat">×</button>
+    </header>
+    <div class="chat-log" id="chatLog" aria-live="polite"></div>
+    <div class="chat-suggest" id="chatSuggest">
+      <button type="button" class="suggest">How has my blood pressure changed?</button>
+      <button type="button" class="suggest">Is my sleep related to my stress?</button>
+      <button type="button" class="suggest">What changed after my medication started?</button>
+      <button type="button" class="suggest">What data is missing?</button>
+    </div>
+    <form class="chat-form" id="chatForm">
+      <input id="chatInput" maxlength="500" placeholder="Ask about this record…" autocomplete="off" aria-label="Your question">
+      <button type="submit" class="btn">Send</button>
+    </form>
+    <p class="chat-foot">Explains patterns in the record. Not medical advice.</p>
+  </section>
+  <button type="button" class="chat-launcher" id="chatLauncher" aria-expanded="false" aria-controls="chatPanel">
+    <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Ask HealthLens</span>
+  </button>
+</div>

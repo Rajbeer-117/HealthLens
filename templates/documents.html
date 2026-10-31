@@ -1,0 +1,65 @@
+{% extends 'app_base.html' %}
+{% block title %}Documents | HealthLens{% endblock %}
+{% block page %}
+<div class="dashboard-title">
+  <div>
+    <p class="eyebrow">DOCUMENTS</p>
+    <h1>Documents</h1>
+    <p class="muted">Upload patient workbooks to analyse them, or keep supporting files such as reports and scans.</p>
+  </div>
+</div>
+
+{% for category,message in get_flashed_messages(with_categories=true) %}<div class="alert {{category}}">{{message}}</div>{% endfor %}
+
+<section class="card" id="upload">
+  <h2>Upload files</h2>
+  <div class="upload-grid">
+    <form id="uploadForm" action="{{url_for('documents_upload')}}" method="post" enctype="multipart/form-data" class="dropzone-wrap">
+      <input type="hidden" name="csrf" value="{{chat.csrf}}">
+      <input id="fileInput" class="sr-only" type="file" name="files" multiple accept=".xlsx,.zip,.pdf,.docx,.txt,.csv,.png,.jpg,.jpeg">
+      <label class="dropzone" id="dropzone" for="fileInput">
+        <svg aria-hidden="true" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg>
+        <strong>Drag &amp; drop files here, or click to browse</strong>
+        <span>Excel (.xlsx) · ZIP of Excel workbooks · PDF · Word · CSV · TXT · PNG · JPG</span>
+      </label>
+      <ul class="file-list" id="fileList" aria-live="polite"></ul>
+      <button type="submit" class="btn" id="uploadBtn" disabled>Upload</button>
+    </form>
+
+    <form class="drive-box" action="{{url_for('documents_drive')}}" method="post">
+      <input type="hidden" name="csrf" value="{{chat.csrf}}">
+      <h3>Import from Google Drive</h3>
+      <p class="muted small">Paste a share link to an Excel file, a ZIP, or a Google Sheet. The file must be shared as <strong>“Anyone with the link”</strong>. Private files: download them from Drive and upload them here.</p>
+      <label for="driveLink" class="small">Share link</label>
+      <input id="driveLink" type="url" name="link" placeholder="https://drive.google.com/file/d/…" required>
+      <button type="submit" class="btn">Import from Drive</button>
+    </form>
+  </div>
+  <p class="note"><strong>Excel and ZIP files</strong> must contain patient workbooks (a “Patient Profile” sheet plus lab, vitals or wearable data). They are analysed and appear in the patient list under “My uploads”. Other file types are stored only and are not analysed. Limits: {{max_doc}} MB per document, 6 MB per workbook. Files stay on this computer; do not upload real patient information.</p>
+</section>
+
+<section class="card" id="library">
+  <p class="eyebrow">YOUR FILES</p>
+  <h2>Stored documents <span class="muted small">({{docs|length}})</span></h2>
+  {% if docs %}
+  <div class="table-wrap tall"><table>
+    <thead><tr><th>Name</th><th>Type</th><th>Size</th><th>Added from</th><th>Added</th><th>Actions</th></tr></thead>
+    <tbody>{% for d in docs %}
+      <tr>
+        <td class="doc-name" title="{{d.original_name}}">{{d.original_name}}</td>
+        <td>{% if d.kind=='patient' %}<span class="pill analysed">Patient workbook · analysed</span>{% else %}<span class="pill">{{ doc_types.get('.' ~ d.original_name.rsplit('.',1)[-1]|lower, 'File') }} · stored only</span>{% endif %}</td>
+        <td>{{d.size|human_size}}</td>
+        <td>{{d.origin}}</td>
+        <td>{{d.created_at[:10]}}</td>
+        <td><div class="doc-actions">
+          {% if d.kind=='patient' %}<a href="{{url_for('summary', source='uploaded', patient=d.patient_id)}}">Open summary</a>{% endif %}
+          <a href="{{url_for('document_download', doc_id=d.id)}}">Download</a>
+          <form action="{{url_for('document_delete', doc_id=d.id)}}" method="post" data-confirm="Delete {{d.original_name}}? This cannot be undone."><input type="hidden" name="csrf" value="{{chat.csrf}}"><button type="submit" class="link-btn danger">Delete</button></form>
+        </div></td>
+      </tr>{% endfor %}
+    </tbody>
+  </table></div>
+  {% else %}<p class="muted">Nothing uploaded yet. Use the box above to add your first file.</p>{% endif %}
+</section>
+{% endblock %}
+{% block page_scripts %}<script src="{{ url_for('static',filename='js/documents.js') }}"></script>{% endblock %}
