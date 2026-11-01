@@ -395,6 +395,25 @@ def active_medications(book):
 VITAL_RULES = {'sbp': (90, 119), 'dbp': (60, 79), 'rhr': (60, 100)}  # illustrative adult ranges, not clinical rules
 GROUP_LABELS = {'Lab Results': 'Labs', 'Vitals Daily': 'Vitals', 'Wearable Daily': 'Activity & sleep', 'Women Health': 'Cycle'}
 
+# Time span analysed. Default: the latest 3 months of each record.
+SPANS = {'3m': 3, 'all': None}
+SPAN_LABELS = {'3m': 'Last 3 months', 'all': 'Full record'}
+DEFAULT_SPAN = '3m'
+
+# The three categories in the left panel (same keys as the engine's scenarios) and the measures each one shows.
+CATEGORIES = [
+    {'key': 'metabolic', 'name': 'Metabolic', 'desc': 'Blood sugar, weight and activity',
+     'metrics': ['glucose', 'hba1c', 'weight', 'bmi', 'steps', 'active', 'triglycerides', 'hdl']},
+    {'key': 'cardiovascular', 'name': 'Cardiovascular', 'desc': 'Blood pressure, heart rate, cholesterol, stress and sleep',
+     'metrics': ['sbp', 'dbp', 'rhr', 'hrv', 'ldl', 'total_chol', 'stress', 'sleep']},
+    {'key': 'pcos', 'name': "Women's health (PCOS)", 'desc': 'Cycle regularity, weight, glucose and lipids',
+     'metrics': ['cycle_length', 'weight', 'bmi', 'glucose', 'hba1c', 'triglycerides', 'hdl']},
+]
+CATEGORY_KEYS = {c['key'] for c in CATEGORIES}
+
+def current_span():
+    return (session.get('active') or {}).get('span', DEFAULT_SPAN)
+
 def get_book(source, pid):
     """Return (loader, cache key) for a demo or uploaded patient, or (None, None)."""
     if source == 'uploaded':
@@ -408,13 +427,16 @@ def get_book(source, pid):
 
 _analysis_cache = {}
 
-def get_analysis(source, pid):
+def get_analysis(source, pid, span=None):
+    """(full workbook, analysis). The analysis covers the chosen span (default: latest 3 months)."""
+    span = span if span in SPANS else current_span()
     loader, key = get_book(source, pid)
     if loader is None: return None, None
+    key = f'{key}|{span}'
     if key not in _analysis_cache:
         book = loader()
         if len(_analysis_cache) > 64: _analysis_cache.pop(next(iter(_analysis_cache)))
-        _analysis_cache[key] = (book, analyze_book(book))
+        _analysis_cache[key] = (book, analyze_book(book, SPANS[span]))
     return _analysis_cache[key]
 
 def health_flags_v2(analysis):
@@ -422,7 +444,7 @@ def health_flags_v2(analysis):
     flags = []
     for f in analysis['lab_flags']:
         if f['state'] == 'within': continue
-        flags.append({'metric': f['label'], 'value': f'{f["latest"]:g}', 'unit': f['unit'], 'date': f['date'],
+        flags.append({'key': f['metric'], 'metric': f['label'], 'value': f'{f["latest"]:g}', 'unit': f['unit'], 'date': f['date'],
                       'reference': f['reference'], 'severity': 'Review',
                       'message': f'Latest result is {f["state"]} the reference range listed in the workbook ({f["outside"]} of {f["draws"]} draws outside). Discuss with a qualified clinician; interpretation depends on your health context.'})
     for key, (low, high) in VITAL_RULES.items():
@@ -430,7 +452,7 @@ def health_flags_v2(analysis):
         if not c or not c['points']: continue
         last = c['points'][-1]
         if last['value'] < low or last['value'] > high:
-            flags.append({'metric': c['label'], 'value': f'{last["value"]:g}', 'unit': c['unit'], 'date': last['date'],
+            flags.append({'key': key, 'metric': c['label'], 'value': f'{last["value"]:g}', 'unit': c['unit'], 'date': last['date'],
                           'reference': f'{low}–{high}', 'severity': 'Review',
                           'message': 'Latest daily reading is outside an illustrative adult range. A single reading varies day to day; see the Trends section below for the longer pattern.'})
     return flags
@@ -441,23 +463,25 @@ def key_measures(analysis):
     def last(key):
         c = charts.get(key)
         return c['points'][-1] if c and c['points'] else None
-    def card(label, value, unit, date, trend):
+    def card(key, label, value, unit, date, trend):
         direction = trend['direction'] if trend and trend['sustained'] else 'stable'
-        return {'label': label, 'value': value, 'unit': unit, 'date': date, 'direction': direction,
+        return {'key': key, 'label': label, 'value': value, 'unit': unit, 'date': date, 'direction': direction,
                 'change': f'{trend["change_pct"]:+.1f}%' if trend and trend['sustained'] else ''}
     out = []
     sbp, dbp = last('sbp'), last('dbp')
-    if sbp and dbp: out.append(card('Blood pressure', f'{sbp["value"]:g}/{dbp["value"]:g}', 'mmHg', sbp['date'], trends.get('sbp')))
+    if sbp and dbp: out.append(card('sbp', 'Blood pressure', f'{sbp["value"]:g}/{dbp["value"]:g}', 'mmHg', sbp['date'], trends.get('sbp')))
     for key in ('rhr', 'weight', 'glucose', 'hba1c', 'ldl', 'steps', 'sleep'):
         p = last(key)
-        if p: out.append(card(charts[key]['label'], f'{round(p["value"], 1):g}', charts[key]['unit'], p['date'], trends.get(key)))
+        if p: out.append(card(key, charts[key]['label'], f'{round(p["value"], 1):g}', charts[key]['unit'], p['date'], trends.get(key)))
     return out
 
-def chart_payload(analysis):
-    """Chart data for the Trends section (the engine's unusual-reading markers are left out)."""
+def chart_payload(analysis, keys=None):
+    """Chart data for the Trends section (the engine's unusual-reading markers are left out).
+    keys limits the charts to one category's measures."""
     trends = {t['metric']: t for t in analysis['trends']}
     charts = {}
     for key, c in analysis['charts'].items():
+        if keys is not None and key not in keys: continue
         t = trends.get(key)
         charts[key] = {'label': c['label'], 'unit': c['unit'], 'group': GROUP_LABELS.get(c['group'], c['group']),
                        'points': c['points'], 'trendline': c['trendline'], 'direction': c['direction'], 'ref': c['ref'],
@@ -477,7 +501,9 @@ def resolve_active():
     if wanted in members: selected = wanted
     elif 'PC0101' in members: selected = 'PC0101'
     else: selected = ids[0] if ids else ''
-    session['active'] = {'source': source, 'patient': selected}
+    span = request.args.get('span') or saved.get('span') or DEFAULT_SPAN
+    if span not in SPANS: span = DEFAULT_SPAN
+    session['active'] = {'source': source, 'patient': selected, 'span': span}
     return source, ids, selected
 
 @app.context_processor
@@ -512,16 +538,28 @@ def dashboard():
 @login_required
 def summary():
     source, ids, selected = resolve_active()
+    span = current_span()
+    category = request.args.get('category', 'all')
+    if category not in CATEGORY_KEYS: category = 'all'
     if not selected:
         return render_template('summary.html', source=source, patients=ids, selected='', empty=True)
-    book, analysis = get_analysis(source, selected)
+    book, analysis = get_analysis(source, selected, span)
     info = dict(zip(book.get('Patient Profile', pd.DataFrame()).get('Field', []), book.get('Patient Profile', pd.DataFrame()).get('Value', [])))
-    flags = health_flags_v2(analysis)
+    flags, measures = health_flags_v2(analysis), key_measures(analysis)
+    scen = {s['key']: s for s in analysis['scenarios']}
+    categories = [{**c, 'scenario': scen.get(c['key'])} for c in CATEGORIES]
+    active_cat = next((c for c in categories if c['key'] == category), None)
+    keys = set(active_cat['metrics']) if active_cat else None
+    if keys is not None:
+        flags = [f for f in flags if f['key'] in keys]
+        measures = [m for m in measures if m['key'] in keys]
     return render_template('summary.html', source=source, patients=ids, selected=selected, empty=False,
                            age=_cell_text(info.get('Age')) or '—', sex=_cell_text(info.get('Sex')) or '—',
                            months=round((analysis['data_quality']['window']['days'] or 0) / 30.4),
-                           flags=flags, measures=key_measures(analysis), meds_active=active_medications(book),
-                           chart_data=chart_payload(analysis))
+                           flags=flags, measures=measures, meds_active=active_medications(book),
+                           chart_data=chart_payload(analysis, keys),
+                           categories=categories, category=category, active_cat=active_cat,
+                           span=span, span_label=SPAN_LABELS[span], spans=SPAN_LABELS, span_info=analysis['span'])
 
 @app.route('/profile')
 @login_required
