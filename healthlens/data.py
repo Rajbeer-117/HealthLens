@@ -166,3 +166,40 @@ class PatientRecord:
         v = values[ok].to_numpy(dtype=float)
         order = np.argsort(d.values, kind='stable')
         return Series(key, label, unit, kind, sheet, d[order], v[order], ref_low, ref_high, ref_text)
+
+
+# ---------------------------------------------------------------- time span (e.g. latest 3 months)
+# Measurement sheets are cut to the chosen span, using the date column shown here. Patient Profile,
+# Medical History and Medication History are always kept in full: they are context, not measurements.
+SPAN_SHEETS = {'Lab Results': 'Date', 'Vitals Daily': 'Date', 'Wearable Daily': 'Date', 'Habits Weekly': 'Week Start',
+               'Symptoms Timeline': 'Date', 'Encounters & Notes': 'Date', 'Medication Adherence': 'Month',
+               'Women Health': 'Start Date'}
+
+
+def latest_date(book: dict[str, pd.DataFrame]):
+    """Most recent date found in the measurement sheets (the end of the record)."""
+    ends = []
+    for name, col in SPAN_SHEETS.items():
+        frame = book.get(name)
+        if frame is not None and col in frame.columns:
+            d = to_datetime(frame[col]).dropna()
+            if not d.empty:
+                ends.append(d.max())
+    return max(ends) if ends else None
+
+
+def trim_book(book: dict[str, pd.DataFrame], months: int):
+    """Keep only the latest `months` of measurements. Returns (trimmed book, (start, end)) or (book, None)."""
+    end = latest_date(book)
+    if end is None:
+        return book, None
+    start = (end - pd.DateOffset(months=months)).normalize() + pd.Timedelta(days=1)
+    out = {}
+    for name, frame in book.items():
+        col = SPAN_SHEETS.get(name)
+        if col and col in frame.columns:
+            keep = to_datetime(frame[col]) >= start
+            out[name] = frame[keep.fillna(False).to_numpy(dtype=bool)].reset_index(drop=True)
+        else:
+            out[name] = frame
+    return out, (start, end)
