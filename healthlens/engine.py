@@ -4,7 +4,7 @@ from __future__ import annotations
 import pandas as pd
 
 from . import analysis as A
-from .data import PatientRecord
+from .data import PatientRecord, trim_book
 from .evidence import EvidenceRegistry
 from .scenarios import Ctx, run_scenarios
 from .timeline import build_timeline
@@ -23,7 +23,11 @@ def age_band(age) -> str:
     return f'{lo}–{lo + 9}'
 
 
-def analyze_book(book: dict[str, pd.DataFrame]) -> dict:
+def analyze_book(book: dict[str, pd.DataFrame], months: int | None = None) -> dict:
+    """Analyse one patient. months=3 analyses only the latest 3 months of measurements; None = the full record."""
+    span = None
+    if months:
+        book, span = trim_book(book, months)
     rec = PatientRecord(book)
     start, end = rec.window
     ev = EvidenceRegistry(start)
@@ -65,6 +69,9 @@ def analyze_book(book: dict[str, pd.DataFrame]) -> dict:
         'window': quality['window'],
     }
     return {
+        'span': {'months': months if span else None,
+                 'start': span[0].strftime('%Y-%m-%d') if span else quality['window']['start'],
+                 'end': span[1].strftime('%Y-%m-%d') if span else quality['window']['end']},
         'patient': patient,
         'evidence': evidence,
         'trends': sorted(trends, key=lambda t: (not t['sustained'], -abs(t['change_pct']))),
