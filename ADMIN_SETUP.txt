@@ -1,0 +1,13 @@
+HEALTHLENS ADMIN SETUP (local demo)
+
+1. Sign up for a normal account through /register.
+2. Stop the Flask server (Ctrl+C).
+3. In the project folder run: python app.py --make-admin YOUR_USERNAME
+4. Enter that account's password when prompted. It is not displayed.
+5. Restart: python app.py
+6. Sign in with the admin account, then open /admin or select Admin in the navigation.
+
+Admin features: counts, paginated audit log, recent account list, admin-only access.
+New events are recorded from this update onward. Existing logs are not retroactively imported.
+No email OTP has been added. No patient health readings are shown on the admin page.
+Do not deploy this local academic demo publicly or upload real patient information.

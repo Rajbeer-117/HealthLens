@@ -1,4 +1,4 @@
-import io, zipfile, sqlite3, secrets, hashlib, hmac, re, os
+import io, zipfile, sqlite3, secrets, hashlib, hmac, re, os, sys, getpass
 import urllib.error, urllib.parse, urllib.request
 from datetime import datetime, timezone
 from email.message import Message
@@ -10,6 +10,9 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from healthlens import analyze_book
 from healthlens import llm
 from healthlens.data import clean_sheet
+
+from pathlib import PurePosixPath
+from werkzeug.utils import secure_filename
 
 ROOT = Path(__file__).resolve().parent
 app = Flask(__name__)
@@ -26,13 +29,75 @@ MAX_PER_UPLOAD = 20             # files in one upload request
 # Supporting documents are stored and can be downloaded, but are not analysed.
 DOC_TYPES = {'.pdf': 'PDF', '.docx': 'Word', '.txt': 'Text', '.csv': 'CSV', '.png': 'Image', '.jpg': 'Image', '.jpeg': 'Image'}
 
+def clean_upload_filename(filename):
+    normalized = str(filename).replace("\\", "/")
+    basename = PurePosixPath(normalized).name
+    return secure_filename(basename)
+
 def db():
     conn=sqlite3.connect(DB)
     conn.row_factory=sqlite3.Row
     conn.execute('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT UNIQUE COLLATE NOCASE NOT NULL, email TEXT UNIQUE COLLATE NOCASE NOT NULL, password_hash TEXT NOT NULL, created_at TEXT NOT NULL)')
     conn.execute('CREATE TABLE IF NOT EXISTS documents (id INTEGER PRIMARY KEY, user_id INTEGER NOT NULL, original_name TEXT NOT NULL, stored_name TEXT NOT NULL, kind TEXT NOT NULL, patient_id TEXT, size INTEGER NOT NULL, origin TEXT NOT NULL, created_at TEXT NOT NULL)')
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS audit_events (
+            id INTEGER PRIMARY KEY,
+            user_id INTEGER,
+            username TEXT,
+            action TEXT NOT NULL,
+            detail TEXT NOT NULL DEFAULT '',
+            created_at TEXT NOT NULL
+        )
+    """)
+    columns = {r[1] for r in conn.execute('PRAGMA table_info(users)')}
+    if 'is_admin' not in columns: conn.execute('ALTER TABLE users ADD COLUMN is_admin INTEGER NOT NULL DEFAULT 0')
     conn.commit()
     return conn
+
+def audit_event(action, detail='', user_id=None, username=None):
+    """Minimal audit metadata only; no passwords, OTPs or patient measurements."""
+    try:
+        with db() as conn:
+            conn.execute('INSERT INTO audit_events(user_id,username,action,detail,created_at) VALUES(?,?,?,?,?)',
+                         (user_id if user_id is not None else session.get('uid'),
+                          username if username is not None else session.get('username'),
+                          action, str(detail)[:200], datetime.now(timezone.utc).isoformat(timespec='seconds')))
+    except sqlite3.Error:
+        app.logger.exception('Unable to write audit event')
+
+def admin_required(fn):
+    @wraps(fn)
+    def inner(*args, **kwargs):
+        if not session.get('uid'): return redirect(url_for('login'))
+        with db() as conn:
+            row = conn.execute('SELECT is_admin FROM users WHERE id=?', (session['uid'],)).fetchone()
+        if not row or not row['is_admin']: abort(403)
+        return fn(*args, **kwargs)
+    return inner
+
+@app.context_processor
+def admin_nav_context():
+    uid = session.get('uid')
+    if not uid: return {'is_admin': False}
+    with db() as conn:
+        row = conn.execute('SELECT is_admin FROM users WHERE id=?', (uid,)).fetchone()
+    return {'is_admin': bool(row and row['is_admin'])}
+
+@app.route('/admin')
+@admin_required
+def admin_dashboard():
+    page = max(1, min(request.args.get('page', 1, type=int), 100000))
+    limit = 30
+    with db() as conn:
+        stats = {
+            'users': conn.execute('SELECT COUNT(*) FROM users').fetchone()[0],
+            'patient_workbooks': conn.execute("SELECT COUNT(*) FROM documents WHERE kind='patient'").fetchone()[0],
+            'supporting_files': conn.execute("SELECT COUNT(*) FROM documents WHERE kind='document'").fetchone()[0],
+            'events': conn.execute('SELECT COUNT(*) FROM audit_events').fetchone()[0],
+        }
+        events = conn.execute('SELECT * FROM audit_events ORDER BY id DESC LIMIT ? OFFSET ?', (limit, (page-1)*limit)).fetchall()
+        users = conn.execute('SELECT id,username,created_at,is_admin FROM users ORDER BY id DESC LIMIT 15').fetchall()
+    return render_template('admin.html', stats=stats, events=events, users=users, page=page, pages=max(1,(stats['events']+limit-1)//limit))
 
 def hash_password(p):
     salt=secrets.token_bytes(16)
@@ -57,26 +122,63 @@ def login_required(fn):
 def home(): return redirect(url_for('summary' if session.get('uid') else 'login'))
 
 @app.route('/register',methods=['GET','POST'])
+
 def register():
-    if request.method=='POST':
-        username=request.form.get('username','').strip()
-        email=request.form.get('email','').strip().lower()
-        password=request.form.get('password','')
-        confirm=request.form.get('confirm','')
-        error=None
-        if not re.fullmatch(r'[A-Za-z0-9_]{3,30}',username): error='Username must be 3–30 letters, numbers or underscores.'
-        elif not re.fullmatch(r'[^\s@]+@[^\s@]+\.[^\s@]+',email): error='Enter a valid email.'
-        elif not 10 <= len(password) <= 128: error='Password must be 10–128 characters.'
-        elif password!=confirm: error='Passwords do not match.'
-        if error: flash(error,'error')
+    if request.method == 'POST':
+        username = request.form.get('username', '').strip()
+        email = request.form.get('email', '').strip().lower()
+        password = request.form.get('password', '')
+        confirm = request.form.get('confirm', '')
+        error = None
+
+        if not re.fullmatch(r'[A-Za-z0-9_]{3,30}', username):
+            error = 'Username must be 3–30 letters, numbers or underscores.'
+
+        elif not re.fullmatch(r'[^\s@]+@[^\s@]+\.[^\s@]+', email):
+            error = 'Enter a valid email.'
+
+        elif not 10 <= len(password) <= 128:
+            error = 'Password must be 10–128 characters.'
+
+        elif not re.search(r'[A-Z]', password):
+            error = 'Password must contain at least one uppercase letter.'
+
+        elif not re.search(r'[a-z]', password):
+            error = 'Password must contain at least one lowercase letter.'
+
+        elif not re.search(r'[0-9]', password):
+            error = 'Password must contain at least one number.'
+
+        elif not re.search(r'[^A-Za-z0-9]', password):
+            error = 'Password must contain at least one special character.'
+
+        elif password != confirm:
+            error = 'Passwords do not match.'
+
+        if error:
+            flash(error, 'error')
         else:
             try:
                 with db() as conn:
-                    conn.execute('INSERT INTO users(username,email,password_hash,created_at) VALUES(?,?,?,?)',(username,email,hash_password(password),datetime.now(timezone.utc).isoformat()))
-                flash('Account created. Please sign in.','success')
+                    conn.execute(
+                        'INSERT INTO users(username,email,password_hash,created_at) VALUES(?,?,?,?)',
+                        (
+                            username,
+                            email,
+                            hash_password(password),
+                            datetime.now(timezone.utc).isoformat()
+                        )
+                    )
+
+                audit_event('register', 'Account created', username=username)
+                flash('Account created. Please sign in.', 'success')
                 return redirect(url_for('login'))
-            except sqlite3.IntegrityError: flash('Username or email already exists.','error')
+
+            except sqlite3.IntegrityError:
+                flash('Username or email already exists.', 'error')
+
     return render_template('register.html')
+
 
 @app.route('/login',methods=['GET','POST'])
 def login():
@@ -88,13 +190,16 @@ def login():
         if user and verify(password,user['password_hash']):
             session.clear()
             session['uid']=user['id']; session['username']=user['username']
+            audit_event('login', 'Successful sign-in')
             return redirect(url_for('summary'))
+        audit_event('login_failed', 'Invalid credentials')
         flash('Incorrect email/username or password.','error')
     return render_template('login.html')
 
 @app.route('/logout',methods=['POST'])
 @login_required
 def logout():
+    audit_event('logout', 'Signed out')
     session.clear()
     return redirect(url_for('login'))
 
@@ -137,10 +242,20 @@ def validate_workbook(raw):
         raise ValueError('Workbook must include Lab Results, Vitals Daily, or Wearable Daily.')
     return book
 
+
 def base_name(name):
-    """Bare file name for display: no folders, no control characters."""
-    name=re.sub(r'[\x00-\x1f\x7f]','',str(name)).replace('\\','/').split('/')[-1].strip()
-    return name[:120] or 'file'
+    """Return a safe filename without directory components."""
+    normalized = str(name).replace("\\", "/")
+    basename = PurePosixPath(normalized).name
+
+    # Remove control characters
+    basename = re.sub(r'[\x00-\x1f\x7f]', '', basename)
+
+    # Sanitize filename
+    basename = secure_filename(basename)
+
+    return basename[:120] or 'file'
+
 
 def clean_stem(name):
     """Patient id taken from a workbook name. 'PC0101 (1).xlsx' -> 'PC0101_1'."""
@@ -228,7 +343,9 @@ def run_ingest(items, origin):
     parts=[]
     if patients: parts.append(f'{len(patients)} patient workbook{"s" if len(patients)!=1 else ""} imported and analysed')
     if documents: parts.append(f'{documents} document{"s" if documents!=1 else ""} stored')
-    if parts: flash(' · '.join(parts)+'.','success')
+    if parts:
+        audit_event('upload', f'{len(patients)} workbooks; {documents} supporting files; {len(errors)} errors')
+        flash(' · '.join(parts)+'.','success')
     for msg in errors[:5]: flash(msg,'error')          # flashes live in the cookie, so keep the list short
     if len(errors)>5: flash(f'…and {len(errors)-5} more file(s) could not be imported.','error')
 
@@ -632,6 +749,7 @@ def document_delete(doc_id):
     with db() as conn: conn.execute('DELETE FROM documents WHERE id=?', (doc_id,))
     if row['kind'] == 'patient':
         for key in [k for k in _analysis_cache if k.startswith(f'u{session["uid"]}:{row["patient_id"]}:')]: _analysis_cache.pop(key, None)
+    audit_event('file_delete', f'{row["kind"]} document id {doc_id}')
     flash(f'Deleted {row["original_name"]}.', 'success')
     return redirect(url_for('documents'))
 
@@ -664,4 +782,15 @@ def api_ask(pid):
     return jsonify(result)
 
 if __name__=='__main__':
-    app.run(debug=True,host='127.0.0.1',port=5000)
+    if len(sys.argv) == 3 and sys.argv[1] == '--make-admin':
+        username = sys.argv[2]
+        with db() as conn:
+            user = conn.execute('SELECT id,password_hash FROM users WHERE username=?', (username,)).fetchone()
+            if not user: sys.exit('No such registered username.')
+            password = getpass.getpass('Confirm this user\'s password: ')
+            if not verify(password, user['password_hash']): sys.exit('Incorrect password; no changes made.')
+            conn.execute('UPDATE users SET is_admin=1 WHERE id=?', (user['id'],))
+        print('Admin access enabled for:', username)
+    else:
+        app.run(debug=True,host='127.0.0.1',port=5000)
+
