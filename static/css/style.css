@@ -134,3 +134,51 @@ td.wrap{white-space:normal;min-width:240px}
 .summary-layout>*{min-width:0}
 .span-toggle{display:flex}
 .summary-main .stat strong{font-size:20px}
+
+/* Password validation checklist */
+
+.password-checklist {
+    margin: 12px 0 20px;
+    padding: 16px 18px;
+    background: #f8f5fc;
+    border: 1px solid #e9def4;
+    border-radius: 12px;
+}
+
+.checklist-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #49325f;
+    margin: 0 0 12px;
+}
+
+.requirement {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: #8b8494;
+    margin-bottom: 9px;
+    transition: color 0.2s ease;
+}
+
+.requirement:last-child {
+    margin-bottom: 0;
+}
+
+.status-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    font-size: 17px;
+}
+
+.requirement.valid {
+    color: #16803c;
+    font-weight: 500;
+}
+
+.requirement.valid .status-icon {
+    color: #16803c;
+}
