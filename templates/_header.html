@@ -3,6 +3,7 @@
   <nav class="main-nav" aria-label="Main">
     <a href="{{url_for('summary')}}" class="{{ 'active' if request.endpoint in ('summary','dashboard') else '' }}">Summary</a>
     <a href="{{url_for('profile')}}" class="{{ 'active' if request.endpoint=='profile' else '' }}">Profile</a>
+    {% if is_admin %}<a href="{{url_for('admin_dashboard')}}" class="{{ 'active' if request.endpoint=='admin_dashboard' else '' }}">Admin</a>{% endif %}
     <a href="{{url_for('documents')}}" class="{{ 'active' if request.endpoint=='documents' else '' }}">Documents</a>
   </nav>
   <div class="header-right">
