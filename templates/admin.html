@@ -1,0 +1,20 @@
+{% extends 'app_base.html' %}
+{% block title %}Admin | HealthLens{% endblock %}
+{% block page %}
+<div class="dashboard-title"><div><p class="eyebrow">ADMINISTRATION</p><h1>Admin dashboard</h1><p class="muted">Account activity and system overview. No patient health measurements are shown here.</p></div></div>
+<div class="stats stats-5">
+ <div class="stat"><span>Registered users</span><strong>{{stats.users}}</strong></div>
+ <div class="stat"><span>Patient workbooks</span><strong>{{stats.patient_workbooks}}</strong></div>
+ <div class="stat"><span>Supporting files</span><strong>{{stats.supporting_files}}</strong></div>
+ <div class="stat"><span>Audit events</span><strong>{{stats.events}}</strong></div>
+</div>
+<section class="card"><p class="eyebrow">ACTIVITY</p><h2>Audit log</h2><p class="muted small">Recent registrations, sign-ins, uploads and deletions. Times are UTC.</p>
+<div class="table-wrap"><table><thead><tr><th>Time (UTC)</th><th>User</th><th>Action</th><th>Details</th></tr></thead><tbody>
+{% for e in events %}<tr><td>{{e.created_at}}</td><td>{{e.username or 'Guest'}}</td><td>{{e.action}}</td><td>{{e.detail}}</td></tr>{% else %}<tr><td colspan="4">No events recorded yet.</td></tr>{% endfor %}
+</tbody></table></div>
+<div class="doc-actions" style="margin-top:1rem">{% if page>1 %}<a href="{{url_for('admin_dashboard',page=page-1)}}">← Previous</a>{% endif %}<span>Page {{page}} of {{pages}}</span>{% if page<pages %}<a href="{{url_for('admin_dashboard',page=page+1)}}">Next →</a>{% endif %}</div>
+</section>
+<section class="card"><p class="eyebrow">ACCOUNTS</p><h2>Recent registered users</h2><div class="table-wrap"><table><thead><tr><th>ID</th><th>Username</th><th>Registered (UTC)</th><th>Role</th></tr></thead><tbody>
+{% for u in users %}<tr><td>{{u.id}}</td><td>{{u.username}}</td><td>{{u.created_at[:19]}}</td><td>{{'Admin' if u.is_admin else 'User'}}</td></tr>{% endfor %}
+</tbody></table></div></section>
+{% endblock %}
