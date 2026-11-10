@@ -54,14 +54,12 @@
 <section class="card" id="readings">
   <p class="eyebrow">KEY READINGS</p>
   <h2>Latest values</h2>
-  <p class="muted">Most recent recorded value for the main measures. The trend note appears only when the change was consistent over time.</p>
   <div class="measure-grid">
     {% for m in measures %}
     <article class="measure">
       <span class="measure-label">{{m.label}}</span>
       <strong>{{m.value}} <small>{{m.unit}}</small></strong>
-      <span class="dir dir-{{m.direction}}">{% if m.direction=='rising' %}▲ Rising {{m.change}}{% elif m.direction=='falling' %}▼ Falling {{m.change}}{% else %}No consistent trend{% endif %}</span>
-      <span class="measure-date">Recorded {{m.date}}</span>
+      {% if m.direction=='rising' %}<span class="dir dir-rising">▲ Rising {{m.change}}</span>{% elif m.direction=='falling' %}<span class="dir dir-falling">▼ Falling {{m.change}}</span>{% endif %}
     </article>
     {% endfor %}
   </div>
@@ -70,7 +68,7 @@
 
 <section class="warning-section" id="flags">
   <div class="section-heading"><div><p class="eyebrow">HEALTH REVIEW</p><h2>Recent flags</h2></div><span class="flag-count">{{flags|length}} flagged indicator{{'s' if flags|length != 1 else ''}}</span></div>
-  <p class="muted">Lab values are compared with the reference range printed in the patient's own workbook; vitals use illustrative adult ranges. These are educational flags, not diagnoses.</p>
+  <p class="muted">Lab values are compared with the reference range in the patient's own records</p>
   {% if flags %}
   <div class="warning-grid">{% for flag in flags %}
     <article class="warning-card">
@@ -81,19 +79,17 @@
     </article>{% endfor %}
   </div>
   {% else %}<div class="no-flags">No out-of-range latest values detected for the supported indicators. This does not establish that the patient is healthy.</div>{% endif %}
-  <p class="note">This prototype does not triage. For symptoms or concerns, contact a healthcare professional.</p>
+  <p class="note">For symptoms or concerns, contact a healthcare professional.</p>
 </section>
 
 <section class="card" id="trends">
   <p class="eyebrow">TRENDS</p>
   <h2>Trends over time</h2>
-  <p class="muted">Dashed line = trend line (shown only when the change was consistent over time). Shaded band = reference range from the workbook (labs).</p>
+  <p class="muted">Choose a measure to view its readings over time.</p>
   <div class="filter-row" id="groupFilters" aria-label="Filter measures"></div>
   <div class="chart-controls"><label for="metricSelect" class="small muted">Measure</label><select id="metricSelect"></select></div>
   <div class="chart-wrap"><canvas id="healthChart" role="img" aria-label="Chart of the selected measure over time"></canvas></div>
   <p class="trend-note" id="trendNote"></p>
-  <h3 class="mt">All measures <span class="muted small">(click a chart to enlarge it)</span></h3>
-  <div class="mini-chart-grid" id="miniCharts"></div>
 </section>
 
 </div>
