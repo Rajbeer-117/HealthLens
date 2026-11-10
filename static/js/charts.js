@@ -7,7 +7,6 @@
   const order = data.order;
   const metric = document.getElementById('metricSelect');
   const filters = document.getElementById('groupFilters');
-  const holder = document.getElementById('miniCharts');
   const note = document.getElementById('trendNote');
   if (typeof Chart === 'undefined') {
     document.getElementById('healthChart').insertAdjacentHTML('beforebegin', '<p>Chart.js could not load, so the charts are unavailable.</p>');
@@ -53,7 +52,7 @@
     if (t && t.sustained) {
       const sign = t.slope_per_month > 0 ? '+' : '';
       parts.push(`${c.label} has been ${t.direction} consistently: ${t.baseline} → ${t.recent} ${c.unit} (${t.change_pct > 0 ? '+' : ''}${t.change_pct}%), about ${sign}${t.slope_per_month} ${c.unit} per month.`);
-    } else parts.push(`No consistent trend in ${c.label.toLowerCase()} over this period.`);
+    }
     if (c.ref && c.ref.text) parts.push(`Reference range: ${c.ref.text} ${c.unit}.`);
     note.textContent = parts.join(' ');
   }
@@ -65,27 +64,13 @@
   }
   metric.addEventListener('change', drawMain);
 
-  // ---- selector options and the mini chart grid
-  const arrow = c => c.direction === 'rising' ? ' ▲' : c.direction === 'falling' ? ' ▼' : '';
-  const minis = {};
-  function fillSelect(keys) {   // rebuilt (not hidden) so it behaves the same in every browser
+  // ---- selector options: one full-sized chart only
+  const arrow = c => c.trend && c.trend.sustained ? (c.trend.direction === 'rising' ? ' ▲' : c.trend.direction === 'falling' ? ' ▼' : '') : '';
+  function fillSelect(keys) {
     metric.replaceChildren();
     keys.forEach(k => { const c = data.charts[k]; const o = el('option', '', `${c.label} (${c.unit})${arrow(c)}`); o.value = k; metric.append(o); });
   }
   fillSelect(order);
-  order.forEach(k => {
-    const c = data.charts[k];
-    const card = el('article', 'mini-chart'); card.tabIndex = 0; card.setAttribute('role', 'button');
-    card.setAttribute('aria-label', `Show ${c.label} in the large chart`);
-    const h = el('h4', '', `${c.label} `); h.append(el('small', 'muted', c.unit));
-    if (c.direction === 'rising' || c.direction === 'falling') h.append(el('span', 'dir dir-' + c.direction, arrow(c)));
-    const wrap = el('div', 'mini-canvas'), cv = el('canvas'); wrap.append(cv); card.append(h, wrap); holder.append(card);
-    new Chart(cv, { type: 'line', data: { datasets: datasetsFor(c, true) }, options: options(c, true), plugins: [refBand] });
-    const pick = () => { metric.value = k; drawMain(); document.getElementById('healthChart').scrollIntoView({ behavior: 'smooth', block: 'center' }); };
-    card.addEventListener('click', pick);
-    card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
-    minis[k] = card;
-  });
 
   // ---- group filter (Labs, Vitals, Activity & sleep, ...)
   const groups = ['All', ...new Set(order.map(k => data.charts[k].group))];
@@ -95,10 +80,10 @@
     b.addEventListener('click', () => {
       filters.querySelectorAll('.filter').forEach(x => x.classList.toggle('active', x === b));
       const keys = order.filter(k => g === 'All' || data.charts[k].group === g);
-      order.forEach(k => { minis[k].hidden = !keys.includes(k); });
       const current = metric.value;
       fillSelect(keys);
-      if (keys.includes(current)) metric.value = current; else drawMain();
+      if (keys.includes(current)) metric.value = current;
+      if (keys.length) drawMain();
     });
     filters.append(b);
   });
