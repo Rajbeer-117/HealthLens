@@ -42,11 +42,53 @@ def env(tmp_path, monkeypatch):
     return tmp_path
 
 
+
 def make_client(name='tester'):
     c = app_module.app.test_client()
-    c.post('/register', data={'username': name, 'email': f'{name}@example.com', 'password': 'longpassword1', 'confirm': 'longpassword1'})
-    c.post('/login', data={'identity': name, 'password': 'longpassword1'})
+
+    password = 'HealthLens@Test123'
+
+    # Register a test user
+    register_response = c.post(
+        '/register',
+        data={
+            'username': name,
+            'email': f'{name}@example.com',
+            'password': password,
+            'confirm': password
+        },
+        follow_redirects=False
+    )
+
+    assert register_response.status_code == 302, (
+        f"Registration failed for {name}: "
+        f"{register_response.get_data(as_text=True)[:500]}"
+    )
+
+    # Log in with the registered account
+    login_response = c.post(
+        '/login',
+        data={
+            'identity': name,
+            'password': password
+        },
+        follow_redirects=False
+    )
+
+    assert login_response.status_code == 302, (
+        f"Login failed for {name}: "
+        f"{login_response.get_data(as_text=True)[:500]}"
+    )
+
+    # Verify that the test user is authenticated
+    profile_response = c.get('/profile')
+
+    assert profile_response.status_code == 200, (
+        f"Test user {name} is not authenticated."
+    )
+
     return c
+
 
 
 @pytest.fixture()
@@ -204,18 +246,52 @@ def test_reuploading_a_patient_replaces_it(client):
 
 
 # ------------------------------------------------------------- download / delete / isolation
+
 def test_download_and_delete(client):
+    # Upload a test PDF
     upload(client, [('scan.pdf', PDF)])
     doc = doc_rows()[0]
-    r = client.get(f'/documents/{doc["id"]}/download')
-    assert r.status_code == 200 and r.data == PDF
-    assert 'attachment' in r.headers['Content-Disposition'] and 'scan.pdf' in r.headers['Content-Disposition']
+
+    # Download the PDF and buffer the response
+    r = client.get(
+        f'/documents/{doc["id"]}/download',
+        buffered=True
+    )
+
+    # Verify the downloaded file
+    assert r.status_code == 200
+    assert r.data == PDF
+    assert 'attachment' in r.headers['Content-Disposition']
+    assert 'scan.pdf' in r.headers['Content-Disposition']
     assert r.headers['X-Content-Type-Options'] == 'nosniff'
-    assert client.post(f'/documents/{doc["id"]}/delete', data={'csrf': 'bad'}, follow_redirects=True).status_code == 200
-    assert len(doc_rows()) == 1                                              # bad token: nothing deleted
-    r = client.post(f'/documents/{doc["id"]}/delete', data={'csrf': csrf(client)}, follow_redirects=True)
-    assert 'Deleted scan.pdf' in r.get_data(as_text=True) and doc_rows() == []
+
+    # Close the response to release the file handle on Windows
+    r.close()
+
+    # Test deletion with an invalid CSRF token
+    r = client.post(
+        f'/documents/{doc["id"]}/delete',
+        data={'csrf': 'bad'},
+        follow_redirects=True
+    )
+
+    assert r.status_code == 200
+    assert len(doc_rows()) == 1  # File must not be deleted
+
+    # Test deletion with a valid CSRF token
+    r = client.post(
+        f'/documents/{doc["id"]}/delete',
+        data={'csrf': csrf(client)},
+        follow_redirects=True
+    )
+
+    # Verify successful deletion
+    assert 'Deleted scan.pdf' in r.get_data(as_text=True)
+    assert doc_rows() == []
+
+    # Verify the PDF was removed from storage
     assert not list(app_module.UPLOADS.rglob('*.pdf'))
+
 
 
 def test_deleting_a_patient_removes_it_from_the_patient_list(client):
@@ -382,3 +458,52 @@ def test_chat_is_scoped_to_the_signed_in_users_uploads(client):
     assert client.post('/api/patients/PC0002/ask', headers=h, json=body).status_code == 200
     other = make_client('mallory')
     assert other.post('/api/patients/PC0002/ask', headers={'X-CSRF-Token': csrf(other)}, json=body).status_code == 404
+
+
+# ------------------------------------------------------------- category panel + 3-month data span
+
+def test_summary_has_three_category_panel(client):
+    html = client.get('/summary?patient=PC0101').get_data(as_text=True)
+    assert 'category-panel' in html
+    for name in ('Metabolic', 'Cardiovascular', "Women&#39;s health (PCOS)"):
+        assert name in html
+
+
+def test_default_span_is_last_three_months(client):
+    html = client.get('/summary?patient=PC0101').get_data(as_text=True)
+    assert 'Last 3 months' in html and '2026-06-01 to 2026-08-31' in html
+
+
+def test_full_record_span_switch(client):
+    html = client.get('/summary?patient=PC0101&span=all').get_data(as_text=True)
+    assert '2025-09-01 to 2026-08-31' in html
+    html = client.get('/summary?patient=PC0101').get_data(as_text=True)   # choice is remembered
+    assert '2025-09-01 to 2026-08-31' in html
+
+
+def test_category_filters_readings_and_charts(client):
+    import json, re
+    html = client.get('/summary?patient=PC0101&category=cardiovascular').get_data(as_text=True)
+    assert 'id="category"' in html and 'Blood pressure' in html
+    charts = json.loads(re.search(r'id="chartData">(.*?)</script>', html, re.S).group(1))['charts']
+    assert 'sbp' in charts and 'glucose' not in charts
+    html = client.get('/summary?patient=PC0101&category=metabolic').get_data(as_text=True)
+    charts = json.loads(re.search(r'id="chartData">(.*?)</script>', html, re.S).group(1))['charts']
+    assert 'glucose' in charts and 'sbp' not in charts
+
+
+def test_pcos_category_not_applicable_for_male(client):
+    html = client.get('/summary?patient=PC0101&category=pcos').get_data(as_text=True)
+    assert 'Not applicable' in html
+
+
+def test_engine_three_month_trim():
+    import io, zipfile
+    import pandas as pd
+    from healthlens import analyze_book
+    z = zipfile.ZipFile(ROOT / 'patient_data.zip')
+    name = next(n for n in z.namelist() if n.endswith('/PC0101.xlsx'))
+    book = pd.read_excel(io.BytesIO(z.read(name)), sheet_name=None, engine='openpyxl')
+    a = analyze_book(book, 3)
+    assert a['span'] == {'months': 3, 'start': '2026-06-01', 'end': '2026-08-31'}
+    assert all(p['date'] >= '2026-06-01' for c in a['charts'].values() for p in c['points'])

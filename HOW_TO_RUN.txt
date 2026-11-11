@@ -35,23 +35,29 @@ WHAT YOU NEED (one time)
   Stop the app:     click the terminal, press Ctrl + C
 
 --------------------------------------------------------------
- HOW TO SEE THE AI / LLM IS WORKING
+ THE APP: SUMMARY, PROFILE, DOCUMENTS + CHATBOT
 --------------------------------------------------------------
   1. Sign up / sign in.
-  2. Top-right GREEN badge "AI: llama3.2..."  = LLM connected.
-     (Orange "AI: Offline templates" = Ollama not running -> open the
-      Ollama app from the Start menu, wait 10 s, refresh the page.)
-  3. Dashboard -> tab "AI Health Summary":
-       pill "LLM-generated - passed guardrails" = written by the LLM.
-       First answer can take 30-60 s while the model loads.
-  4. Click "Show exactly what the AI received and returned":
-       shows the rules given to the LLM, the de-identified data sent,
-       the RAW LLM output, and the guardrail check for each attempt.
-  5. Ask HealthLens: click the example questions or type your own.
-       "Do I have diabetes?" -> safety response (AI never diagnoses).
-  6. Menu "AI Integration" page:
-       "Test LLM connection" button, AI pipeline, guardrails, system
-       prompt and the AI audit log of every call.
+  2. Summary   - LEFT PANEL: 3 categories (Metabolic, Cardiovascular,
+                 Women's health / PCOS) + 'All measures'. Click one to see its
+                 signal checks; readings, flags and charts then show only that
+                 category. DATA SPAN switch: 'Last 3 months' (default) or
+                 'Full record'.
+                 Also shows key readings, recent flags and trend charts for the
+                 selected patient (use "Demo patients" / "My uploads"
+                 and the Patient menu at the top right of the page).
+  3. Profile   - your account details plus the patient's details and
+                 medical history (conditions and medications).
+  4. Documents - upload patient workbooks (.xlsx, or a .zip of .xlsx),
+                 supporting files (PDF, Word, CSV, TXT, PNG, JPG), or import
+                 a file from Google Drive by pasting its share link
+                 (sharing must be "Anyone with the link").
+  5. Chatbot   - the round "Ask HealthLens" button at the bottom-right of
+                 every page. Click a suggested question or type your own.
+                 "Do I have diabetes?" gives a safety reply: it never diagnoses.
+     In the chat header, a GREEN dot = an LLM is connected; ORANGE =
+     offline template answers (open the Ollama app, wait 10 s, refresh).
+     The first LLM answer can take 30-60 s while the model loads.
 
 --------------------------------------------------------------
  GOOD DEMO PATIENTS
@@ -62,7 +68,7 @@ WHAT YOU NEED (one time)
 --------------------------------------------------------------
  OTHER COMMANDS (in the VS Code terminal, after activate)
 --------------------------------------------------------------
-  python -m pytest -q             -> 40 automated tests
+  python -m pytest -q             -> automated tests
   python validate_scenarios.py    -> runs all 900 patients (~6 min)
                                      results: validation\validation_summary.md
 

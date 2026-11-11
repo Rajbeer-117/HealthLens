@@ -192,19 +192,92 @@ def test_api_requires_login():
     assert app_module.app.test_client().get('/api/patients').status_code == 401
 
 
+
 def test_api_flow(client):
-    assert 'PC0101' in client.get('/api/patients').get_json()['patients']
-    a = client.get('/api/patients/PC0101/analysis').get_json()
+    # Register and log in a test user
+    password = 'HealthLens@Test123'
+
+    register_response = client.post(
+        '/register',
+        data={
+            'username': 'apitester',
+            'email': 'apitester@example.com',
+            'password': password,
+            'confirm': password
+        },
+        follow_redirects=False
+    )
+
+    assert register_response.status_code == 302, (
+        f"Registration failed: {register_response.get_data(as_text=True)[:500]}"
+    )
+
+    login_response = client.post(
+        '/login',
+        data={
+            'identity': 'apitester',
+            'password': password
+        },
+        follow_redirects=False
+    )
+
+    assert login_response.status_code == 302, (
+        f"Login failed: {login_response.get_data(as_text=True)[:500]}"
+    )
+
+    # Verify authentication
+    profile = client.get('/profile')
+    assert profile.status_code == 200
+
+    # Verify patient API
+    response = client.get('/api/patients')
+    assert response.status_code == 200
+    assert 'PC0101' in response.get_json()['patients']
+
+    # Verify patient analysis
+    response = client.get('/api/patients/PC0101/analysis')
+    assert response.status_code == 200
+
+    a = response.get_json()
     assert a['evidence'] and a['scenarios']
+
+    # Verify summary page
     page = client.get('/summary?patient=PC0101')
     assert page.status_code == 200
+
+    # Get CSRF token
+    client.get('/documents')
+
     with client.session_transaction() as s:
         token = s['upload_csrf']
-    assert client.post('/api/patients/PC0101/ask', json={'question': 'How is my sleep?'}).status_code == 400  # no CSRF header
-    r = client.post('/api/patients/PC0101/ask', json={'question': 'How is my sleep?'}, headers={'X-CSRF-Token': token})
-    assert r.status_code == 200 and r.get_json()['answer']
-    r = client.post('/api/patients/PC0101/ask', json={'question': 'Do I have diabetes?'}, headers={'X-CSRF-Token': token})
-    assert r.get_json()['mode'] == 'screened'
+
+    # Verify chatbot rejects requests without CSRF
+    response = client.post(
+        '/api/patients/PC0101/ask',
+        json={'question': 'How is my sleep?'}
+    )
+    assert response.status_code == 400
+
+    # Verify chatbot answers valid questions
+    response = client.post(
+        '/api/patients/PC0101/ask',
+        json={'question': 'How is my sleep?'},
+        headers={'X-CSRF-Token': token}
+    )
+
+    assert response.status_code == 200
+    assert response.get_json()['answer']
+
+    # Verify unsafe medical questions are screened
+    response = client.post(
+        '/api/patients/PC0101/ask',
+        json={'question': 'Do I have diabetes?'},
+        headers={'X-CSRF-Token': token}
+    )
+
+    assert response.status_code == 200
+    assert response.get_json()['mode'] == 'screened'
+
 
 
 def test_summary_includes_deidentified_trace(a101):

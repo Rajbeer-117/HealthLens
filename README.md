@@ -75,11 +75,9 @@ The LLM is called over HTTP using Python's standard library (`urllib`), so no AI
 
 | # | Feature | Where to find it | What the LLM does |
 |---|---|---|---|
-| 1 | **AI Health Summary** | Dashboard → **✦ AI Health Summary** tab (opens first) | Writes an overview, 3–5 key points (each citing evidence), questions to ask a healthcare professional, and limitations |
-| 2 | **Ask HealthLens** (chat) | Same tab, below the summary | Answers free-text questions about the selected patient, using only that patient's evidence |
-| 3 | **AI transparency panel** | Under the summary: *"🔍 Show exactly what the AI received and returned"* | Shows the system prompt, the de-identified data sent, the **raw LLM output** and the guardrail result for every attempt |
-| 4 | **AI Integration page** | Top menu → **✦ AI Integration** | **⚡ Test LLM connection** (live round-trip), the pipeline, the guardrail list, the system prompt and the AI audit log |
-| 5 | **AI status badge** | Header, on every page | Green: an LLM is connected (shows the model name). Orange: offline templates |
+| 1 | **HealthLens chatbot** | Round button at the **bottom-right of every page** (Summary, Profile, Documents) | Answers free-text questions about the selected patient, using only that patient's evidence. The conversation is kept while you move between pages |
+
+The earlier *AI Health Summary* tab, the AI transparency panel and the *AI Integration* page were removed from the interface in the current layout. The LLM code that powered them (`llm.summarize`, `llm.test_connection`, the audit log) is still in `healthlens/llm.py` and covered by tests, so they can be brought back.
 
 Each AI answer carries a label:
 
@@ -146,7 +144,7 @@ Shape of the expected reply:
 - **Summary task** (`SUMMARY_TASK`). Return JSON with `overview`, 3–5 `points` (each with `evidence`), `questions` and `limitations`. Prefer multi-signal patterns.
 - **Ask task** (`ASK_TASK`). Return `{"answer", "evidence"}`. The user's question is wrapped in `<question>` tags, and the model is told to ignore any instructions inside them (basic prompt-injection protection).
 
-You can read the full prompts in the app: **AI Integration → View the system prompt**, and in the transparency panel under every answer.
+The full prompts are in `healthlens/llm.py` (`SYSTEM_PROMPT`, `SUMMARY_TASK`, `ASK_TASK`).
 
 ---
 
@@ -210,9 +208,8 @@ To configure, copy `.env.example` to `.env` and edit it. Optional settings: `HEA
 
 ## 9. Transparency and audit
 
-- **Evidence chips.** Click any `E12` in an AI answer to see the exact fact, the statistical method and the source sheet. The **Evidence Register** tab lists them all.
-- **Trace panel.** For each AI call it shows the system prompt, the de-identified prompt, every LLM attempt with its raw output, how long it took, and the rules it broke (if any).
-- **Audit log** (`logs/ai_audit.jsonl`, also shown on the AI Integration page). For each call it records the time, user, patient ID, action, provider, model, result, whether the guardrails passed, and latency.
+- **Evidence IDs.** The engine still numbers every finding (`E1…En`) and the LLM must cite them; the chatbot hides the IDs from patients, and the guardrails reject any ID that does not exist.
+- **Audit log** (`logs/ai_audit.jsonl`). For each chatbot call it records the time, user, patient ID, action, provider, model, result, whether the guardrails passed, and latency. No question text or health values are logged.
 
 ---
 
@@ -240,12 +237,11 @@ Login is required. POST requests need the `X-CSRF-Token` header that the page pr
 
 | Method | Endpoint | Purpose |
 |---|---|---|
-| GET | `/api/llm/status` | Active provider and model |
-| POST | `/api/llm/test` | Live connection test (no health data sent) |
 | GET | `/api/patients?source=demo` | Patient list |
 | GET | `/api/patients/<id>/analysis` | Full engine output (evidence, trends, scenarios, timeline…) |
-| POST | `/api/patients/<id>/ai-summary` | LLM summary plus trace |
-| POST | `/api/patients/<id>/ask` | LLM answer to `{"question": "..."}` plus trace |
+| POST | `/api/patients/<id>/ask` | Chatbot answer to `{"question": "...", "source": "demo"}` |
+
+The pages are `/summary`, `/profile` and `/documents` (`/dashboard` redirects to `/summary`). Documents are handled by `POST /documents/upload`, `POST /documents/drive`, `GET /documents/<id>/download` and `POST /documents/<id>/delete`, all of which are limited to the signed-in user's own files.
 
 ---
 
@@ -277,7 +273,7 @@ Login is required. POST requests need the `X-CSRF-Token` header that the page pr
 ## 13. Code map
 
 ```
-app.py                    Flask: auth, upload, dashboard, AI Integration page, REST API
+app.py                    Flask: auth, Summary / Profile / Documents pages, file + Google Drive import, chatbot API
 healthlens/
   llm.py                  ★ LLM layer: providers, auto-detect, prompts, de-identified context,
                             guardrails, question screening, retry/fallback, trace, audit log
@@ -287,8 +283,8 @@ healthlens/
   evidence.py             evidence format (E1…En); dashboard vs de-identified rendering
   timeline.py             unified timeline
   data.py                 workbook cleaning and time series
-templates/                dashboard.html, ai.html (AI Integration), _header.html (AI badge), login/register
-static/js/app.js          AI summary, chat, evidence pop-ups, trace panel, charts
+templates/                summary.html, profile.html, documents.html, app_base.html (frame + chatbot), login/register
+static/js/                charts.js (trend charts), chat.js (chatbot), documents.js (upload page)
 tests/                    pytest suite (includes a mock LLM server)
 validate_scenarios.py     900-patient validation
 run_with_llm.bat          one-click start with Ollama (Windows)
@@ -306,3 +302,10 @@ run_with_llm.bat          one-click start with Ollama (Windows)
 - The thresholds are demonstration heuristics, not clinical cut-offs. The cardiovascular scenario separates patients weakly on this synthetic data and needs refinement.
 - The data is synthetic. Authentication is for a demo only: there is no patient-level authorization, rate limiting or encryption at rest.
 - Next: multi-turn chat memory, clinician vs patient explanation modes, LLM evaluation on a labelled set of answers, and integration with PranaChain's EHR APIs.
+
+
+## Update: category panel and 3-month data span
+
+- **Left panel on the Summary page:** the 3 categories (**Metabolic**, **Cardiovascular**, **Women's health (PCOS)**) plus *All measures*. Each shows its status (e.g. "Some related signals", "2 of 6 signal groups"). Clicking a category shows its signal checks and filters the key readings, flags and charts to that category's measures.
+- **3-month data span:** by default, the analysis (summary, categories, charts and the chatbot) uses only the **latest 3 months** of each record. A *Last 3 months / Full record* switch in the panel changes it, and the choice is remembered. Profile and medical history always show the full record.
+- Code: `healthlens/data.py` (`trim_book`), `healthlens/engine.py` (`analyze_book(book, months=3)`), `app.py` (`CATEGORIES`, `SPANS`, `summary()`), `templates/_category_panel.html`, `templates/summary.html`, `static/css/style.css`; tests in `tests/test_app_pages.py`.
