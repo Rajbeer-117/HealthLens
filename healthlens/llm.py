@@ -24,6 +24,7 @@ import hashlib
 import json
 import os
 import re
+import threading
 import time
 import urllib.error
 import urllib.request
@@ -33,30 +34,48 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
+
 DEFAULT_MODELS = {
-    'ollama': 'llama3.2',
+    'ollama': 'llama3.2:latest',
     'anthropic': 'claude-haiku-5-5',
     'openai': 'gpt-4o-mini',
     'offline': 'template-v2',
 }
 
-SYSTEM_PROMPT = """You are the explanation assistant inside HealthLens, an academic proof-of-concept health dashboard.
-A transparent statistics engine has ALREADY analysed one person's synthetic health record. You receive its results as
-numbered evidence items (E1, E2, ...). Your job is to explain them in calm, plain language (about grade-8 reading level).
 
-Mandatory rules:
-1. Use ONLY the evidence provided. Do not invent values, dates, conditions or events. You may add one short sentence of
-   general educational context about what a measure is (for example what HbA1c measures).
-2. Every point must cite the evidence IDs it relies on in its "evidence" list. Never cite an ID that is not provided.
-3. Do NOT diagnose. Never say or imply the person has, may have, or is developing a condition. If a condition appears in
-   the evidence as a recorded medical-history entry, call it "recorded in the medical history".
-4. Do NOT estimate risk, give probabilities, percentages of likelihood, confidence scores, or predictions.
-5. Do NOT recommend starting, stopping or changing any medication or dose, and do not prescribe treatment or diets.
-6. Do NOT use alarming words (dangerous, alarming, critical, life-threatening) and do NOT tell the person to go to an
-   emergency room or hospital. Notable patterns are things to talk through with a healthcare professional.
-7. When two signals changed together, say they "moved together" - never that one caused the other.
-8. Mention relevant data limitations (missing days, few lab draws) when they matter.
-Return ONLY valid JSON, no markdown fences."""
+HEALTHLENS_SYSTEM_PROMPT = """
+You are HealthLens Assistant, a friendly health-data
+explanation assistant.
+
+Your role is to explain recorded health information
+in simple, everyday English.
+
+RULES:
+1. Answer naturally, like a helpful human assistant.
+2. Avoid technical jargon and repetitive sentences.
+3. Explain what changed and what the change means
+   in terms of the recorded measurements.
+4. Use actual patient data only.
+5. Never invent values, dates or medications.
+6. Summarize related changes together.
+7. Explain medical terms in plain language.
+8. Keep answers concise, usually 80-150 words.
+9. Distinguish observations from possible causes.
+10. Do not diagnose, predict diseases or give
+    medication or treatment advice.
+11. Do not claim a medication caused a change.
+12. Recommend consulting a doctor when appropriate.
+
+For medication comparisons:
+- Mention the medication name and start date once.
+- Group related measurements together.
+- Explain increases or decreases simply.
+- Avoid repeating disclaimers.
+- Do not infer medication effectiveness.
+
+Answer the user's question directly.
+"""
+
 
 SUMMARY_TASK = """Write a patient-friendly summary of this record as JSON with exactly this shape:
 {
@@ -103,7 +122,7 @@ def detect_ollama(host: str) -> str | None:
         return _auto['model']
     model = None
     try:
-        with urllib.request.urlopen(f'{host}/api/tags', timeout=1.5) as resp:
+        with urllib.request.urlopen(f'{host}/api/tags', timeout=120) as resp:
             names = [m.get('name', '') for m in json.loads(resp.read().decode('utf-8')).get('models', [])]
         names = [n for n in names if 'embed' not in n]
         model = next((n for pref in PREFERRED_OLLAMA for n in names if n.startswith(pref)), names[0] if names else None)
@@ -198,13 +217,16 @@ def _post(url, payload, headers, timeout):
         raise LLMError('Provider returned a non-JSON response.') from exc
 
 
+KEEP_ALIVE = os.environ.get('HEALTHLENS_KEEP_ALIVE', '30m')   # speed only: keep the local model loaded between questions
+
+
 def call_llm(system: str, messages: list[dict], c: dict | None = None) -> str:
     """messages: [{'role': 'user'|'assistant', 'content': str}]. Returns the reply text."""
     c = c or config()
     p, t = c['provider'], c['timeout']
     if p == 'ollama':
         data = _post(f'{c["ollama_host"]}/api/chat',
-                     {'model': c['model'], 'stream': False, 'format': 'json', 'options': {'temperature': 0.2},
+                     {'model': c['model'], 'stream': False, 'format': 'json', 'options': {'temperature': 0.2}, 'keep_alive': KEEP_ALIVE,
                       'messages': [{'role': 'system', 'content': system}, *messages]}, {}, t)
         return data.get('message', {}).get('content', '')
     if p == 'anthropic':
@@ -489,13 +511,29 @@ def _run(kind: str, analysis: dict, task: str, c: dict):
     trace records exactly what was sent and received, so the dashboard can show the AI's work."""
     valid = {e['id'] for e in analysis['evidence']}
     context = build_context(analysis)
-    messages = [{'role': 'user', 'content': f'{context}\n\n{task}'}]
-    trace = {'system_prompt': SYSTEM_PROMPT, 'user_prompt': messages[0]['content'], 'attempts': []}
+    
+    messages = [
+    {
+        'role': 'system',
+        'content': HEALTHLENS_SYSTEM_PROMPT
+    },
+    {
+        'role': 'user',
+        'content': f'{context}\n\n{task}'
+    }
+    ]
+
+    trace = {
+    'system_prompt': HEALTHLENS_SYSTEM_PROMPT,
+    'user_prompt': messages[1]['content'],
+    'attempts': []
+    }
+
     problems: list[str] = []
     for attempt in range(2):
         t0 = time.time()
         try:
-            text = call_llm(SYSTEM_PROMPT, messages, c)
+            text = call_llm(HEALTHLENS_SYSTEM_PROMPT, messages, c)
         except LLMError as exc:
             trace['attempts'].append({'n': attempt + 1, 'raw_reply': '', 'error': str(exc), 'problems': [],
                                       'ms': int((time.time() - t0) * 1000)})
@@ -516,7 +554,7 @@ def _run(kind: str, analysis: dict, task: str, c: dict):
 
 
 def _offline_trace(analysis, task):
-    return {'system_prompt': SYSTEM_PROMPT, 'user_prompt': f'{build_context(analysis)}\n\n{task}', 'attempts': [],
+    return {'system_prompt': HEALTHLENS_SYSTEM_PROMPT, 'user_prompt': f'{build_context(analysis)}\n\n{task}', 'attempts': [],
             'offline': True}
 
 
@@ -553,7 +591,19 @@ def summarize(analysis: dict) -> dict:
     return result
 
 
+def _timing(out: dict) -> dict:
+    """Response-time breakdown added to an answer (recording only; the answer itself is unchanged)."""
+    attempts = (out.get('trace') or {}).get('attempts', [])
+    return {'total_ms': out.get('latency_ms', 0), 'llm_ms': sum(a.get('ms', 0) for a in attempts), 'attempts': len(attempts)}
+
+
 def ask(analysis: dict, question: str) -> dict:
+    out = _ask(analysis, question)
+    out['timing'] = _timing(out)
+    return out
+
+
+def _ask(analysis: dict, question: str) -> dict:
     c = config()
     st = status()
     t0 = time.time()
@@ -580,6 +630,26 @@ def ask(analysis: dict, question: str) -> dict:
         out['trace'] = trace
     out['latency_ms'] = int((time.time() - t0) * 1000)
     return out
+
+
+_warm = {'at': 0.0}
+
+
+def warm_up(force: bool = False) -> bool:
+    """Speed only: load the local Ollama model in the background (at most every 10 minutes) so the first
+    question does not wait for it to load. Sends no patient data and does not change any answer."""
+    c = config()
+    if c['provider'] != 'ollama' or (not force and time.time() - _warm['at'] < 600):
+        return False
+    _warm['at'] = time.time()
+
+    def run():
+        try:
+            _post(f'{c["ollama_host"]}/api/generate', {'model': c['model'], 'prompt': '', 'keep_alive': KEEP_ALIVE}, {}, c['timeout'])
+        except LLMError:
+            pass
+    threading.Thread(target=run, daemon=True).start()
+    return True
 
 
 def test_connection() -> dict:
@@ -617,6 +687,7 @@ def audit(user_id, patient, action, result):
     rec = {'ts': datetime.now(timezone.utc).isoformat(timespec='seconds'), 'user': user_id, 'patient': patient,
            'action': action, 'provider': result.get('provider'), 'model': result.get('model'), 'mode': result.get('mode'),
            'guardrails_passed': result.get('guardrails', {}).get('passed'),
-           'issues': len(result.get('guardrails', {}).get('issues', [])), 'latency_ms': result.get('latency_ms')}
+           'issues': len(result.get('guardrails', {}).get('issues', [])), 'latency_ms': result.get('latency_ms'),
+           **{k: v for k, v in (result.get('timing') or {}).items() if k in ('total_ms', 'llm_ms', 'analysis_ms', 'attempts')}}
     with open(folder / 'ai_audit.jsonl', 'a', encoding='utf-8') as fh:
         fh.write(json.dumps(rec) + '\n')
