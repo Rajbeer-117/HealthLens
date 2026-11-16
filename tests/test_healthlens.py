@@ -15,6 +15,7 @@ import pytest
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 os.environ['HEALTHLENS_LLM_PROVIDER'] = 'offline'
+os.environ['HEALTHLENS_SECRET_KEY'] = os.environ.get('HEALTHLENS_SECRET_KEY') or 'test-secret'   # keeps tests away from the real database at import time
 
 from healthlens import analyze_book, llm  # noqa: E402
 from healthlens.analysis import mann_kendall, theil_sen  # noqa: E402
@@ -162,7 +163,7 @@ def test_llm_retry_after_guardrail_failure(a101, monkeypatch):
     monkeypatch.setenv('OPENAI_BASE_URL', f'http://127.0.0.1:{srv.server_port}/v1')
     llm._cache.clear()
     s = llm.summarize(a101)
-    srv.shutdown()
+    srv.shutdown(); srv.server_close()
     assert s['mode'] == 'llm' and s['overview'] == 'A year of records.'
 
 
@@ -180,6 +181,7 @@ def test_llm_unreachable_falls_back(a101, monkeypatch):
 def client(tmp_path, monkeypatch):
     import app as app_module
     monkeypatch.setattr(app_module, 'DB', tmp_path / 'users.sqlite3')
+    monkeypatch.setattr(app_module, 'UPLOADS', tmp_path / 'uploads')
     app_module.app.config['TESTING'] = True
     c = app_module.app.test_client()
     c.post('/register', data={'username': 'tester', 'email': 't@example.com', 'password': 'longpassword1', 'confirm': 'longpassword1'})
@@ -228,6 +230,15 @@ def test_api_flow(client):
     # Verify authentication
     profile = client.get('/profile')
     assert profile.status_code == 200
+
+    # Upload a patient workbook (new accounts start empty: there is no demo data)
+    client.get('/documents')
+    with client.session_transaction() as s:
+        token = s['upload_csrf']
+    z = zipfile.ZipFile(ROOT / 'patient_data.zip')
+    raw = z.read(next(n for n in z.namelist() if n.endswith('/PC0101.xlsx')))
+    client.post('/documents/upload', data={'csrf': token, 'files': [(io.BytesIO(raw), 'PC0101.xlsx')]},
+                content_type='multipart/form-data')
 
     # Verify patient API
     response = client.get('/api/patients')
