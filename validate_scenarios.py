@@ -90,7 +90,7 @@ def main():
         lines.append(f'- {col.replace("_", " ")}: {df[col].mean():.1f}')
     lines += ['', f'Evidence statements that tripped the LLM guardrail patterns (should be 0): **{int(df["guardrail_flags_in_evidence"].sum())}**', '',
               '## Limitations', '',
-              '- The data is synthetic; agreement with recorded history is a consistency check, not clinical accuracy.',
+              '- The data provided by the business partner is a mix of synthetic and real records; agreement with recorded history is a consistency check, not clinical accuracy.',
               '- Thresholds are documented demonstration heuristics, not clinical cut-offs.',
               '- No confidence scores are produced (per business guidance).']
     if errors:
