@@ -1,0 +1,7 @@
+Clinic visit summary (synthetic sample)
+Patient name: Maya Patel
+Patient ID: PC0303
+Visit date: 2026-04-18
+Blood pressure: 121/80 mmHg   Heart rate: 68 bpm
+Weight: 146 lb   BMI: 26.8
+Notes: Routine follow-up. Discussed activity and sleep. Repeat labs as planned.
