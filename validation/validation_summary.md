@@ -1,6 +1,6 @@
 # HealthLens Deliverable 2: scenario validation
 
-Patients analysed: **900** (errors: 0) in 356 s
+Patients analysed: **900** (errors: 0) in 209 s
 
 ## Scenario status counts
 
@@ -34,6 +34,6 @@ Evidence statements that tripped the LLM guardrail patterns (should be 0): **0**
 
 ## Limitations
 
-- The data is synthetic; agreement with recorded history is a consistency check, not clinical accuracy.
+- The data provided by the business partner is a mix of synthetic and real records; agreement with recorded history is a consistency check, not clinical accuracy.
 - Thresholds are documented demonstration heuristics, not clinical cut-offs.
 - No confidence scores are produced (per business guidance).
