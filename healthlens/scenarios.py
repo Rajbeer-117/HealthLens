@@ -47,7 +47,7 @@ class Ctx:
 def check(name, ctx: Ctx, keys, finders, quiet_text):
     """Run finder functions; return a check result."""
     if not any(ctx.has(k) for k in keys):
-        return {'signal': name, 'status': 'missing', 'text': 'No data recorded for this signal.', 'evidence': []}
+        return {'signal': name, 'status': 'missing', 'text': 'No data', 'evidence': []}
     found = [f for f in (fn() for fn in finders) if f]
     if not found:
         return {'signal': name, 'status': 'quiet', 'text': quiet_text, 'evidence': []}
