@@ -1,13 +1,40 @@
-HEALTHLENS ADMIN SETUP (local demo)
+HEALTHLENS TEAM (ADMIN) SETUP
 
-1. Sign up for a normal account through /register.
-2. Stop the Flask server (Ctrl+C).
-3. In the project folder run: python app.py --make-admin YOUR_USERNAME
-4. Enter that account's password when prompted. It is not displayed.
-5. Restart: python app.py
-6. Sign in with the admin account, then open /admin or select Admin in the navigation.
+Patients use HealthLens normally: Summary, Profile, Documents and the chatbot. They never see
+anything about administration: no link, no script or style file mentions it, and /admin returns the
+same "page not found" as any address that does not exist (also when signed out).
 
-Admin features: counts, paginated audit log, recent account list, admin-only access.
-New events are recorded from this update onward. Existing logs are not retroactively imported.
-No email OTP has been added. No patient health readings are shown on the admin page.
+Where it is stored: team access is kept in its own database table (team_admins), separate from the
+users table. The role is checked in the database on every request; nothing a patient's browser sends can grant it.
+After signing in, team members land on the System dashboard and patients land on their Summary.
+
+Team members (admins) use the same app, upload their own records like any patient, and see one
+extra tab: "System dashboard" (statistics on users, sign-ins, uploads, storage and chatbot
+response times; no health readings and no chatbot questions are ever shown there).
+
+Giving team (admin) access
+
+A. The FIRST team member (once, on the computer running the app):
+   1. Sign up for a normal account at /register.
+   2. Stop the app (Ctrl+C) and, in the project folder, run:
+          python app.py --make-admin USERNAME
+      Type that account's password when asked (it is not displayed).
+   3. Start the app again (python app.py) and sign in. You land on the System dashboard.
+
+B. Everyone after that, from the System dashboard (no terminal needed):
+   1. The new team member signs up for a normal account at /register.
+   2. A current team member opens System dashboard > Team access. Every account is listed with its
+      role. Click "Grant access" on the new member's row, type YOUR OWN password in the pop-up and
+      confirm. A message confirms the change ("Team access granted to ...").
+   3. The new member's next page load shows the System dashboard tab.
+
+Revoking team access: click "Revoke access" on that member's row and confirm with your own password.
+Your own row shows "You" instead of a button: you cannot revoke your own access (another team member
+must do it), so the team can never lock itself out. From the terminal:  python app.py --remove-admin USERNAME
+
+Safety: the Team access table and pop-up only exist for signed-in team members (everyone else gets "page not
+found", including for the form's address). Every change needs the team member's own password and a
+CSRF token, uses parameterised SQL, and is recorded in the activity log (team_grant / team_remove;
+wrong passwords are logged as team_access_denied). Patients cannot give themselves access.
+
 Do not deploy this local academic demo publicly or upload real patient information.

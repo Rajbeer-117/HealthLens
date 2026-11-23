@@ -1,0 +1,98 @@
+HealthLens: documents uploaded one by one
+==========================================
+
+WHY
+The course dataset gives each patient one workbook with a full year of data. That is for building and
+testing the analysis. In real life a patient never has everything in one place: they get a lab report,
+export readings from a blood-pressure monitor or a fitness tracker, keep a visit note. HealthLens therefore
+takes documents ONE AT A TIME, reads the values out of each one in the back end, and builds up the patient's
+record document by document. Risk levels and risk factors are calculated from whatever has been uploaded,
+even a single document, and the page names the measures that are still missing.
+
+WHAT CAN BE UPLOADED (Documents page)
+  Lab report, PDF with selectable text   test names in common variants ("LDL-C", "Hemoglobin A1c",
+                                          "Glucose, Fasting"...); SI units used in Canada (mmol/L, umol/L,
+                                          g/L, nmol/L, pmol/L) converted; reference ranges; collection date;
+                                          Patient ID, sex and age (or date of birth)
+  Lab report, Word (.docx) or text (.txt) same as PDF
+  Clinic visit note (.txt/.docx/.pdf)     blood pressure, heart rate, weight (kg or lb), BMI, SpO2, temperature
+  CSV export                              lab results, home blood-pressure monitor, fitness tracker (steps,
+                                          sleep in hours or minutes, heart rate, HRV...), period tracker,
+                                          symptoms, medications
+  Excel workbook (.xlsx/.xlsm)            the HealthLens format, partial workbooks, or any sheet whose
+                                          columns look like one of the tables above
+  ZIP of workbooks                        many patients at once (used for the 900-patient testing)
+  Photo / scan (.png/.jpg)                read only if the optional OCR tool Tesseract is installed
+                                          (see below); otherwise stored for reference
+
+Safety: a value is only recorded if its unit fits the test and the value is physically possible, so a
+misread number (for example from a blurry photo) never becomes a false flag. Documents without readable
+values are stored only, with the reason shown. Nothing is guessed or inferred.
+
+WHOSE RECORD A DOCUMENT JOINS (one account = one patient)
+  The record belongs to the account from its first upload; its key never changes and never comes from a
+  document. A name, Patient ID, sex or date of birth printed in a document is a FACT about that document,
+  compared with what the record already knows. The back end decides; there is nothing for the patient to
+  confirm (healthlens/record_rules.py):
+    Reject     the document shows a different NAME, SEX or DATE OF BIRTH than the record, an age that does
+               not fit the date of birth, or period data while the record is male:
+               "note.txt lists name Jane Doe, but 01_lab_report_2025-09-25.pdf says Maya Patel. Not added."
+    Reject     the document shows a Patient ID not seen on this record before, unless the SAME NAME or the
+               SAME DATE OF BIRTH shows it is the same person (labs and clinics each issue their own IDs).
+    Accept     no Patient ID (device exports), a Patient ID already on the record, the first document,
+               a new Patient ID with the same name or date of birth, old reports, partly overlapping reports.
+    Leave out  single impossible readings (e.g. glucose 9000 mg/dL, a reading dated in the future); the rest of
+               the document is kept and the Documents page says how many were left out.
+  Names are compared ignoring capitals, punctuation and word order, and a middle name or initial may be
+  added: "PATEL, Maya R." matches "Maya Patel"; "Jane Doe" does not match "John Doe".
+  Deleting a document removes everything it contributed, including a Patient ID, name, sex or date of birth
+  that no remaining document shows, so a wrong first upload cannot lock the record.
+  Team (admin) accounts may hold several records, to test the provided 900-patient dataset: there the
+  Patient ID still decides the record, as before.
+  The same file uploaded twice is not stored again, and the same reading in two documents is counted once.
+
+DATABASE DESIGN
+  See DATABASE_DESIGN.md (tables, keys, the reasoning behind each, and example queries).
+
+RISK SCORE, RISK LEVEL AND RISK FACTORS (Summary page) - TRAINED MODEL
+  The business partner's dataset is used to TRAIN the model (train_risk_model.py), as asked:
+    training data  the 900 patient workbooks (patient_data.zip, a mix of synthetic and real records)
+    inputs         measurements only: labs, vitals, wearable data, menstrual cycles, age and sex
+                   (medical history and medications are never inputs)
+    answer key     the patient's recorded medical history names a related condition
+                   (metabolic: prediabetes / type 2 diabetes / borderline glycemic markers;
+                    cardiovascular: hypertension / hyperlipidemia; women's health: PCOS)
+    method         one logistic-regression model per category; 80% of patients train it, 20% that it never
+                   saw test it; whole sources (all labs, all vitals...) are hidden at random during training
+                   so it also works from a single document
+    result on the 20% test patients (AUC, 0.5 = chance, 1.0 = perfect):
+                   metabolic 0.82 (old rules 0.72),
+                   cardiovascular 0.92 (old rules 0.59),
+                   women's health 1.00 (only 14 patients with PCOS, 3 in the test set: not reliable)
+    details        validation/risk_model_report.md; weights in healthlens/risk_model.json
+  For each category the patient sees:
+    risk score     0-100 from the trained model, using all their documents
+    risk level     Low (< 35), Moderate (35-64), High (65+)
+    risk factors   the measures that raised the score most
+    missing inputs "2 of 6 key inputs missing: A and B. This prediction is based on the other 4 (...), so the
+                   prediction score may not be accurate"
+  No confidence or uncertainty value is shown (business partner, kickoff). It is an educational score,
+  not a diagnosis. If the model file is missing, the rule-based level is used instead.
+  Retrain:  python train_risk_model.py   (about 2 minutes)
+
+TRY IT
+  sample_documents/ holds 8 synthetic documents for patient PC0303 (2 lab reports in different units,
+  a Word lab report, a lab CSV, a home blood-pressure export, a fitness-tracker export, a period
+  tracker export, a clinic visit note, and a photo of a lab report). Sign up, then upload them one at a
+  time on the Documents page and watch the Summary page build up. They were made from PC0303.xlsx with
+  validation/make_sample_documents.py.
+
+OPTIONAL: READING PHOTOS (OCR)
+  Windows: install Tesseract from https://github.com/UB-Mannheim/tesseract/wiki, tick "Add to PATH",
+  then:  pip install pytesseract pillow
+  Mac:     brew install tesseract   then   pip install pytesseract pillow
+  Restart the app. Without it, photos are stored only.
+
+LIMITS (next steps)
+  Scanned PDFs without selectable text need OCR (stored only for now). Report layouts that put the test
+  name and its value on different lines may be missed. Free-text clinical notes are stored, not interpreted.
