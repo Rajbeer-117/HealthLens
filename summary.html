@@ -3,18 +3,24 @@
 {% block page %}
 <div class="dashboard-title">
   <div>
+    {% if report %}
+    <p class="eyebrow">REPORT SUMMARY</p>
+    <h1>{{ report.original_name }}</h1>
+    <p class="muted">Added {{ report.created_at|localtime('%Y-%m-%d') }} · from this report only · <a href="{{ url_for('summary') }}">Overall summary ({{ reports }} report{{ 's' if reports != 1 else '' }})</a></p>
+    {% else %}
     <p class="eyebrow">SUMMARY</p>
     <h1>Health summary</h1>
-    {% if selected %}<p class="muted">Overview for patient <strong>{{selected}}</strong></p>{% endif %}
+    {% if reports %}<p class="muted">All {{ reports }} report{{ 's' if reports != 1 else '' }} combined · <a href="{{ url_for('documents') }}">View each report</a></p>{% endif %}
+    {% endif %}
   </div>
   {% include '_patient_bar.html' %}
 </div>
 
 {% if empty %}
-<section class="card empty-state">
-  <h2>No patient records to show yet</h2>
-  <p class="muted">{{ 'You have not uploaded any patient workbooks yet.' if source=='uploaded' else 'The built-in demo data (patient_data.zip) was not found or has no workbooks.' }}</p>
-  <p><a class="btn" href="{{url_for('documents')}}">Go to Documents</a> {% if source=='uploaded' %}<a class="btn ghost" href="{{url_for('summary', source='demo')}}">View demo patients</a>{% endif %}</p>
+<section class="card empty-state welcome-state">
+  <h2>Welcome to HealthLens{% if account %}, {{ account.username }}{% endif %}!</h2>
+  <p class="muted">No documents uploaded yet.</p>
+  <p><a class="btn" href="{{url_for('documents')}}">Upload documents</a></p>
 </section>
 {% else %}
 
@@ -23,20 +29,31 @@
 <div class="summary-main">
 
 <div class="stats stats-5">
-  <div class="stat"><span>Patient ID</span><strong>{{selected}}</strong></div>
+  <div class="stat"><span>Patient ID</span><strong>{{ patient_ids|join(", ") if patient_ids else "—" }}</strong></div>
   <div class="stat"><span>Age / Sex</span><strong>{{age}} · {{sex}}</strong></div>
-  <div class="stat"><span>Data span</span><strong>{{span_label}}</strong></div>
+  <div class="stat"><span>{{ 'Report dates' if report else 'Data span' }}</span><strong>{% if report %}{{ span_info.start }}{% if span_info.end != span_info.start %} to {{ span_info.end }}{% endif %}{% else %}{{span_label}}{% endif %}</strong></div>
   <div class="stat"><span>Active medications</span><strong>{{meds_active}}</strong></div>
   <div class="stat"><span>Recent flags</span><strong>{{flags|length}}</strong></div>
 </div>
 
-{% if active_cat %}{% set sc = active_cat.scenario %}
+{% if active_cat %}{% set sc = active_cat.scenario %}{% set rk = active_cat.risk %}
 <section class="card category-detail" id="category">
   <div class="section-heading"><div><p class="eyebrow">CATEGORY</p><h2>{{ active_cat.name }}</h2></div>
-    {% if sc %}<span class="pill status-{{ sc.status }}">{{ sc.status_text }}</span>{% endif %}</div>
-  <p class="muted">{{ active_cat.desc }}. Based on {{ span_label|lower }} of data ({{ span_info.start }} to {{ span_info.end }}). Readings, flags and charts below show only this category.</p>
+    {% if rk %}<span class="pill risk-{{ (rk.level or 'none')|lower }}">{{ rk.label }}</span>{% endif %}</div>
+  {% if rk and rk.applicable %}
+  <div class="risk-box risk-{{ (rk.level or 'none')|lower }}">
+    {% if rk.risk_score is not none %}<div class="risk-score"><strong>{{ rk.risk_score }}<small>/100</small></strong><span>risk score</span></div>
+    {% else %}<div class="risk-score"><strong>{{ rk.score }}<small>/{{ rk.out_of }}</small></strong><span>risk factors</span></div>{% endif %}
+    <div class="risk-text">
+      <p><strong>{{ rk.label }}</strong> · {{ rk.summary }}</p>
+      {% if rk.factors %}<p class="small"><strong>Risk factors:</strong> {% for f in rk.factors %}{{ f.detail }}{{ '; ' if not loop.last else '' }}{% endfor %}</p>{% endif %}
+      {% if rk.missing_note %}<p class="missing-note" role="note">{{ rk.missing_note }}</p>{% endif %}
+    </div>
+  </div>
+  {% endif %}
+  <p class="muted">{{ active_cat.desc }}</p>
   {% if not sc or sc.status == 'not_applicable' %}
-  <p class="no-flags">{{ sc.note if sc else 'No data for this category.' }}</p>
+  <p class="no-flags">{% if not sc %}No data for this category.{% elif rk and rk.applicable %}No cycle data uploaded yet.{% else %}{{ sc.note }}{% endif %}</p>
   {% else %}
   <ul class="checks">
     {% for c in sc.checks %}
@@ -44,8 +61,7 @@
       <div><strong>{{c.signal}}</strong><span>{{c.text}}</span></div></li>
     {% endfor %}
   </ul>
-  {% if sc.note %}<p class="note">{{ sc.note }}</p>{% endif %}
-  <p class="note">● noteworthy finding · ○ data present, nothing noteworthy · – no data in this span. A count of related signals, not a risk score or diagnosis.{% if span == '3m' %} Patterns that need a longer history (lab draws, menstrual cycles) may only appear with <a href="{{ url_for('summary', span='all', category=category) }}">Full record</a>.{% endif %}</p>
+  <p class="note">● risk factor · ○ normal · – missing</p>
   {% endif %}
 </section>
 {% endif %}
@@ -68,24 +84,24 @@
 
 <section class="warning-section" id="flags">
   <div class="section-heading"><div><p class="eyebrow">HEALTH REVIEW</p><h2>Recent flags</h2></div><span class="flag-count">{{flags|length}} flagged indicator{{'s' if flags|length != 1 else ''}}</span></div>
-  <p class="muted">Lab values are compared with the reference range in the patient's own records</p>
   {% if flags %}
   <div class="warning-grid">{% for flag in flags %}
     <article class="warning-card">
-      <div class="warning-top"><span class="warning-icon">!</span><strong>{{flag.metric}}</strong><span class="warning-status">{{flag.severity}}</span></div>
+      <div class="warning-top"><span class="warning-icon">!</span><strong>{{flag.metric}}</strong></div>
       <div class="warning-reading">{{flag.value}} <small>{{flag.unit}}</small></div>
-      <p>Reference: <strong>{{flag.reference}} {{flag.unit}}</strong> · Recorded {{flag.date}}</p>
-      <p>{{flag.message}}</p>
+      <p class="warning-ref">Reference: <strong>{{flag.reference}} {{flag.unit}}</strong></p>
+      <details class="flag-review">
+        <summary class="review-btn">{{flag.severity}}</summary>
+        <div class="review-body"><p>{{flag.message}}</p><p class="small muted">Recorded {{flag.date}}</p></div>
+      </details>
     </article>{% endfor %}
   </div>
-  {% else %}<div class="no-flags">No out-of-range latest values detected for the supported indicators. This does not establish that the patient is healthy.</div>{% endif %}
-  <p class="note">For symptoms or concerns, contact a healthcare professional.</p>
+  {% else %}<div class="no-flags">No out-of-range values.</div>{% endif %}
 </section>
 
 <section class="card" id="trends">
   <p class="eyebrow">TRENDS</p>
   <h2>Trends over time</h2>
-  <p class="muted">Choose a measure to view its readings over time.</p>
   <div class="filter-row" id="groupFilters" aria-label="Filter measures"></div>
   <div class="chart-controls"><label for="metricSelect" class="small muted">Measure</label><select id="metricSelect"></select></div>
   <div class="chart-wrap"><canvas id="healthChart" role="img" aria-label="Chart of the selected measure over time"></canvas></div>
